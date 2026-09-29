@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
+import { AudioDeviceOption } from '../types';
+import { CABLE_PLAYBACK_NAME, CABLE_RECORDING_NAME, findCablePlayback, isCablePlayback } from '../routing';
 
-export const ConnectAppsView: React.FC = () => {
+interface ConnectAppsViewProps {
+  outputDevices: AudioDeviceOption[];
+  selectedOutputId: string;
+  inputDeviceLabel: string;
+  onOpenSettings: () => void;
+}
+
+export const ConnectAppsView: React.FC<ConnectAppsViewProps> = ({
+  outputDevices,
+  selectedOutputId,
+  inputDeviceLabel,
+  onOpenSettings,
+}) => {
   const [selectedAppId, setSelectedAppId] = useState<string>('discord');
-  const [makeDefaultMic, setMakeDefaultMic] = useState<boolean>(true);
-  const [useForCalls, setUseForCalls] = useState<boolean>(true);
   const [copied, setCopied] = useState<boolean>(false);
   const [checkedSuccess, setCheckedSuccess] = useState<boolean>(false);
 
@@ -14,7 +26,7 @@ export const ConnectAppsView: React.FC = () => {
       name: 'Microsoft Teams',
       sub: 'Live now · in a meeting',
       live: true,
-      device: 'Aurel Microphone',
+      device: 'CABLE Output',
       st: 'ok',
       path: 'Open Teams, then Settings › Devices.',
     },
@@ -24,7 +36,7 @@ export const ConnectAppsView: React.FC = () => {
       name: 'OBS Studio',
       sub: 'Live now · recording',
       live: true,
-      device: 'Aurel Microphone',
+      device: 'CABLE Output',
       st: 'ok',
       path: 'Open OBS, then Settings › Audio.',
     },
@@ -34,7 +46,7 @@ export const ConnectAppsView: React.FC = () => {
       name: 'Zoom Workplace',
       sub: 'Follows Windows default',
       live: false,
-      device: 'Aurel Microphone',
+      device: 'CABLE Output',
       st: 'ok',
       path: 'Open Zoom, then Settings › Audio.',
     },
@@ -44,7 +56,7 @@ export const ConnectAppsView: React.FC = () => {
       name: 'Discord',
       sub: 'Set to a specific mic',
       live: false,
-      device: checkedSuccess ? 'Aurel Microphone' : 'USB Microphone (unprocessed)',
+      device: checkedSuccess ? 'CABLE Output' : 'USB Microphone (unprocessed)',
       st: checkedSuccess ? 'ok' : 'warn',
       path: 'Open Discord, then User Settings › Voice & Video.',
     },
@@ -54,7 +66,7 @@ export const ConnectAppsView: React.FC = () => {
       name: 'Google Chrome',
       sub: 'Meet and other web apps',
       live: false,
-      device: 'Aurel Microphone',
+      device: 'CABLE Output',
       st: 'ok',
       path: 'In Chrome, open Settings › Privacy › Site settings › Microphone.',
     },
@@ -76,16 +88,24 @@ export const ConnectAppsView: React.FC = () => {
   const eyebrowColor = isWarn ? '#FFC869' : '#6BE3A4';
   const guideWhy = isWarn
     ? `${currentApp.name} is set to your microphone directly, so people hear the raw, quiet mic. It takes about 20 seconds to fix.`
-    : `${currentApp.name} already hears your enhanced voice. If you ever pick a specific mic in it, choose Aurel Microphone.`;
+    : `${currentApp.name} already hears your enhanced voice. If you ever pick a specific mic in it, choose CABLE Output.`;
+
+  const cableDevice = findCablePlayback(outputDevices);
+  const selectedOutput = outputDevices.find((d) => d.deviceId === selectedOutputId);
+  const isSendingToCable = !!selectedOutput && isCablePlayback(selectedOutput.label);
 
   const handleCopyDeviceName = () => {
-    navigator.clipboard?.writeText('Aurel Microphone (Virtual)');
+    navigator.clipboard?.writeText(CABLE_RECORDING_NAME);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleOpenSoundSettings = () => {
-    (window as any).studioAPI?.openVBCableFolder?.();
+    window.studioAPI?.openSoundSettings?.();
+  };
+
+  const handleGetCable = () => {
+    window.studioAPI?.openVBCableFolder?.();
   };
 
   const handleCheckAgain = () => {
@@ -112,7 +132,7 @@ export const ConnectAppsView: React.FC = () => {
               Connect apps
             </h1>
             <span style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>
-              Aurel adds a microphone to Windows called “Aurel Microphone”. Any app that uses it hears your enhanced voice.
+              Aurel sends your enhanced voice through VB-Audio Cable. Any app set to “CABLE Output” as its microphone hears it.
             </span>
           </div>
 
@@ -173,7 +193,7 @@ export const ConnectAppsView: React.FC = () => {
                 </svg>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>USB Microphone</span>
+                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inputDeviceLabel}</span>
                 <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Your microphone</span>
               </div>
             </div>
@@ -219,8 +239,8 @@ export const ConnectAppsView: React.FC = () => {
                 </svg>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Aurel Microphone</span>
-                <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Virtual device · 48 kHz</span>
+                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>VB-Audio Cable</span>
+                <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>CABLE Input › CABLE Output</span>
               </div>
             </div>
 
@@ -243,84 +263,67 @@ export const ConnectAppsView: React.FC = () => {
             </div>
           </div>
 
-          {/* Right Windows default switches */}
+          {/* Right: VB-Cable status */}
           <div
             style={{
               width: '460px',
               flexShrink: 0,
               borderLeft: '1px solid var(--border-subtle)',
-              background: '#141619',
+              background: 'var(--bg-sidebar)',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              gap: '18px',
+              gap: '14px',
               padding: '0 28px',
               boxSizing: 'border-box',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Make Aurel the Windows default mic</span>
-                <span style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
-                  Apps set to “Default” switch over automatically. Undo any time.
-                </span>
-              </div>
+            <span
+              style={{
+                alignSelf: 'flex-start',
+                fontSize: '12px',
+                fontWeight: 600,
+                padding: '4px 10px',
+                borderRadius: '999px',
+                background: isSendingToCable ? 'var(--color-success-tint)' : 'var(--accent-amber-tint)',
+                color: isSendingToCable ? 'var(--color-success-text)' : 'var(--accent-amber-text)',
+              }}
+            >
+              {isSendingToCable ? 'Connected' : cableDevice ? 'Not sending to the cable' : 'VB-Audio Cable not found'}
+            </span>
+            <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
+              {isSendingToCable
+                ? 'Your voice is going into VB-Audio Cable'
+                : cableDevice
+                ? 'Aurel is sending your voice somewhere else'
+                : 'Install VB-Audio Cable to reach your apps'}
+            </span>
+            <span style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
+              {isSendingToCable
+                ? `Aurel plays into ${CABLE_PLAYBACK_NAME}. Apps set to CABLE Output hear it.`
+                : cableDevice
+                ? `Apps can’t hear you until Aurel’s output is set to ${CABLE_PLAYBACK_NAME}.`
+                : 'It’s free. Run the installer as administrator, then restart your PC. Aurel finds the cable automatically.'}
+            </span>
+            {!isSendingToCable && (
               <button
                 type="button"
-                role="switch"
-                aria-checked={makeDefaultMic}
-                onClick={() => setMakeDefaultMic(!makeDefaultMic)}
-                aria-label="Make Aurel the default microphone"
+                onClick={cableDevice ? onOpenSettings : handleGetCable}
                 style={{
-                  width: '44px',
-                  height: '26px',
-                  borderRadius: '13px',
-                  background: makeDefaultMic ? 'var(--accent-amber)' : '#666A73',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: makeDefaultMic ? 'flex-end' : 'flex-start',
-                  padding: '3px',
-                  boxSizing: 'border-box',
-                  flexShrink: 0,
+                  alignSelf: 'flex-start',
+                  height: '40px',
+                  padding: '0 16px',
+                  borderRadius: '10px',
+                  background: 'var(--accent-amber)',
                   border: 0,
-                  cursor: 'pointer',
-                  transition: 'background 0.15s ease',
+                  color: '#1B1204',
+                  fontSize: '13px',
+                  fontWeight: 600,
                 }}
               >
-                <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: makeDefaultMic ? '#1B1204' : '#B9BBC1' }} />
+                {cableDevice ? 'Choose output in Settings' : 'Get VB-Cable'}
               </button>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-subtle)' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>Also use for calls</span>
-                <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Sets the Windows communications device too</span>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={useForCalls}
-                onClick={() => setUseForCalls(!useForCalls)}
-                aria-label="Also use for calls"
-                style={{
-                  width: '44px',
-                  height: '26px',
-                  borderRadius: '13px',
-                  background: useForCalls ? 'var(--accent-amber)' : '#666A73',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: useForCalls ? 'flex-end' : 'flex-start',
-                  padding: '3px',
-                  boxSizing: 'border-box',
-                  flexShrink: 0,
-                  border: 0,
-                  cursor: 'pointer',
-                  transition: 'background 0.15s ease',
-                }}
-              >
-                <span style={{ width: '20px', height: '20px', borderRadius: '50%', background: useForCalls ? '#1B1204' : '#B9BBC1' }} />
-              </button>
-            </div>
+            )}
           </div>
         </section>
 
@@ -587,7 +590,7 @@ export const ConnectAppsView: React.FC = () => {
                   2
                 </span>
                 <span style={{ fontSize: '14px', lineHeight: 1.55, color: 'var(--text-primary)' }}>
-                  Under <strong>Input device</strong>, choose <strong>Aurel Microphone (Virtual)</strong>.
+                  Under <strong>Input device</strong>, choose <strong>{CABLE_RECORDING_NAME}</strong>.
                 </span>
               </li>
 
@@ -646,7 +649,7 @@ export const ConnectAppsView: React.FC = () => {
                   color: 'var(--text-primary)',
                 }}
               >
-                Aurel Microphone (Virtual)
+                {CABLE_RECORDING_NAME}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="m6 15 6-6 6 6" />
                 </svg>
@@ -677,13 +680,13 @@ export const ConnectAppsView: React.FC = () => {
                     color: 'var(--accent-amber-text)',
                   }}
                 >
-                  Aurel Microphone (Virtual)
+                  {CABLE_RECORDING_NAME}
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m5 12 5 5 9-10" />
                   </svg>
                 </span>
                 <span style={{ height: '34px', display: 'flex', alignItems: 'center', padding: '0 10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                  Microphone (USB Microphone)
+                  {inputDeviceLabel}
                 </span>
               </div>
             </div>

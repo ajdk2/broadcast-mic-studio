@@ -11,6 +11,7 @@ export interface StudioBridgeAPI {
   maximizeWindow: () => void;
   closeWindow: () => void;
   openVBCableFolder: () => Promise<boolean>;
+  openSoundSettings: () => Promise<boolean>;
   isElectron: boolean;
 }
 
@@ -25,6 +26,7 @@ const api: StudioBridgeAPI = {
   maximizeWindow: () => ipcRenderer.send('window:maximize'),
   closeWindow: () => ipcRenderer.send('window:close'),
   openVBCableFolder: () => ipcRenderer.invoke('system:open-vbcable-folder'),
+  openSoundSettings: () => ipcRenderer.invoke('system:open-sound-settings'),
   isElectron: true,
 };
 

@@ -203,7 +203,9 @@ export class BroadcastDSPEngine {
     this.mainDestination = this.audioCtx.createMediaStreamDestination();
     this.outputAnalyser.connect(this.mainDestination);
 
-    if (this.mainAudioElement) {
+    // Without a chosen output (normally VB-Cable's CABLE Input), don't play the voice at all:
+    // the default device is usually the speakers, which would feed back into the mic.
+    if (this.mainAudioElement && outputDeviceId) {
       this.mainAudioElement.srcObject = this.mainDestination.stream;
       if (outputDeviceId && 'setSinkId' in this.mainAudioElement) {
         try {

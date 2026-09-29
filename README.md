@@ -71,7 +71,8 @@ npm.cmd start
 
 ## 🎧 Connecting to Discord, Zoom, Teams & OBS
 
-1. In Aurel Voice Studio **Settings**, select your physical microphone as **Input Device**, and select **CABLE Input (VB-Audio Virtual Cable)** as **Output Device**.
-2. In Zoom, Discord, Teams, or OBS, set your microphone to **CABLE Output (VB-Audio Virtual Cable)**.
-3. Turn off built-in noise reduction inside Discord/Zoom so Aurel's studio processing handles the audio cleanly without double-filtering.
+1. Install the free [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (run the installer as administrator, then restart).
+2. In Aurel Voice Studio **Settings › Audio engine**, pick your physical microphone under **Microphone**. **Send my voice to** selects **CABLE Input (VB-Audio Virtual Cable)** automatically once the cable is installed.
+3. In Zoom, Discord, Teams, or OBS, set your microphone to **CABLE Output (VB-Audio Virtual Cable)**.
+4. Turn off built-in noise reduction inside Discord/Zoom so Aurel's studio processing handles the audio cleanly without double-filtering.
 # broadcast-mic-studio

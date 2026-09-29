@@ -14,6 +14,7 @@ import { TrayQuickPanelModal } from './components/TrayQuickPanelModal';
 import { NotificationsDrawer } from './components/NotificationsDrawer';
 import { dspEngine } from './audio/dspEngine';
 import { AUREL_PROFILES, BASE_DSP_PARAMS, MIC_CORRECTION_MODELS, NOISE_MAP } from './presets';
+import { findCablePlayback } from './routing';
 import {
   AudioDeviceOption,
   AurelProfile,
@@ -125,10 +126,16 @@ export default function App() {
       if (ins.length > 0 && !selectedInputId) {
         setSelectedInputId(ins[0].deviceId);
       }
+
+      // Send the enhanced voice to VB-Cable by default, so apps can pick it up as CABLE Output.
+      if (!selectedOutputId) {
+        const cable = findCablePlayback(outs);
+        if (cable) setSelectedOutputId(cable.deviceId);
+      }
     } catch (err) {
       console.warn('Device enumeration error:', err);
     }
-  }, [selectedInputId]);
+  }, [selectedInputId, selectedOutputId]);
 
   useEffect(() => {
     refreshDevices();
@@ -331,6 +338,11 @@ export default function App() {
     return found ? found.label : 'USB Microphone';
   }, [inputDevices, selectedInputId]);
 
+  const selectedOutputLabel = useMemo(
+    () => outputDevices.find((d) => d.deviceId === selectedOutputId)?.label || '',
+    [outputDevices, selectedOutputId]
+  );
+
   const profileToDelete = useMemo(
     () => profiles.find((p) => p.id === deleteProfileId),
     [profiles, deleteProfileId]
@@ -377,6 +389,7 @@ export default function App() {
                 onOpenFineTune={() => setActiveTab('finetune')}
                 meterData={meterData}
                 inputDeviceLabel={selectedInputLabel}
+                outputDeviceLabel={selectedOutputLabel}
               />
             )}
 
@@ -401,7 +414,14 @@ export default function App() {
               />
             )}
 
-            {activeTab === 'connect' && <ConnectAppsView />}
+            {activeTab === 'connect' && (
+              <ConnectAppsView
+                outputDevices={outputDevices}
+                selectedOutputId={selectedOutputId}
+                inputDeviceLabel={selectedInputLabel}
+                onOpenSettings={() => setActiveTab('settings')}
+              />
+            )}
 
             {activeTab === 'settings' && (
               <SettingsView
@@ -409,8 +429,10 @@ export default function App() {
                 outputDevices={outputDevices}
                 selectedInputId={selectedInputId}
                 selectedOutputId={selectedOutputId}
+                selectedMonitorId={selectedMonitorId}
                 onSelectInputId={setSelectedInputId}
                 onSelectOutputId={setSelectedOutputId}
+                onSelectMonitorId={setSelectedMonitorId}
                 theme={theme}
                 onThemeChange={setTheme}
               />
@@ -474,6 +496,7 @@ export default function App() {
         isOpen={isVoiceCheckOpen}
         onClose={() => setIsVoiceCheckOpen(false)}
         inputDevices={inputDevices}
+        outputDevices={outputDevices}
         selectedInputId={selectedInputId}
         onSelectInputId={setSelectedInputId}
         onApplyProfile={(pid) => setCurrentProfileId(pid)}

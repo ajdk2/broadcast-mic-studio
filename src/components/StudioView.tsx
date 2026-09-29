@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AurelProfile, HeadphonePreviewMode, MeterData, NoiseCleanupMode } from '../types';
 import { AUREL_PROFILES, NOISE_MAP } from '../presets';
+import { isCablePlayback } from '../routing';
 import { AurelSlider } from './AurelSlider';
 
 interface StudioViewProps {
@@ -24,6 +25,7 @@ interface StudioViewProps {
   onOpenFineTune?: () => void;
   meterData: MeterData | null;
   inputDeviceLabel: string;
+  outputDeviceLabel: string;
   isMicConnected?: boolean;
   onSelectMicDevice?: () => void;
 }
@@ -49,6 +51,7 @@ export const StudioView: React.FC<StudioViewProps> = ({
   onOpenFineTune,
   meterData,
   inputDeviceLabel,
+  outputDeviceLabel,
   isMicConnected = true,
   onSelectMicDevice,
 }) => {
@@ -232,8 +235,16 @@ export const StudioView: React.FC<StudioViewProps> = ({
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" style={{ flexShrink: 0 }}>
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
-              <span style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>Aurel Microphone</span>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>· used by Microsoft Teams, OBS Studio</span>
+              {isCablePlayback(outputDeviceLabel) ? (
+                <>
+                  <span style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>VB-Audio Cable</span>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>· apps pick CABLE Output</span>
+                </>
+              ) : (
+                <span style={{ color: 'var(--accent-amber-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {outputDeviceLabel ? `${outputDeviceLabel} · apps can’t hear you` : 'Not sent to your apps yet'}
+                </span>
+              )}
             </div>
           </div>
 

@@ -186,6 +186,11 @@ app.whenReady().then(() => {
     return true;
   });
 
+  ipcMain.handle('system:open-sound-settings', () => {
+    shell.openExternal('ms-settings:sound');
+    return true;
+  });
+
   // Window control IPC
   ipcMain.on('window:minimize', () => {
     mainWindow?.minimize();

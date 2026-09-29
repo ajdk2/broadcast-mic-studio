@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { AudioDeviceOption } from '../types';
+import { CABLE_PLAYBACK_NAME, findCablePlayback, isCablePlayback } from '../routing';
 
 interface SettingsViewProps {
   inputDevices: AudioDeviceOption[];
   outputDevices: AudioDeviceOption[];
   selectedInputId: string;
   selectedOutputId: string;
+  selectedMonitorId: string;
   onSelectInputId: (id: string) => void;
   onSelectOutputId: (id: string) => void;
+  onSelectMonitorId: (id: string) => void;
   theme: 'dark' | 'light' | 'system';
   onThemeChange: (theme: 'dark' | 'light' | 'system') => void;
 }
@@ -17,8 +20,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   outputDevices,
   selectedInputId,
   selectedOutputId,
+  selectedMonitorId,
   onSelectInputId,
   onSelectOutputId,
+  onSelectMonitorId,
   theme,
   onThemeChange,
 }) => {
@@ -32,7 +37,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [aiStudioMode, setAiStudioMode] = useState<string>('Recordings only');
 
   const selectedInput = inputDevices.find((d) => d.deviceId === selectedInputId) || inputDevices[0];
-  const selectedOutput = outputDevices.find((d) => d.deviceId === selectedOutputId) || outputDevices[0];
+  const selectedOutput = outputDevices.find((d) => d.deviceId === selectedOutputId);
+  const cableDevice = findCablePlayback(outputDevices);
+  const isSendingToCable = !!selectedOutput && isCablePlayback(selectedOutput.label);
+  const outputHint = isSendingToCable
+    ? 'Apps set to CABLE Output hear your enhanced voice'
+    : cableDevice
+    ? `Choose ${CABLE_PLAYBACK_NAME} so your apps can hear you`
+    : 'Install VB-Audio Cable so your apps can hear you';
 
   return (
     <div
@@ -138,7 +150,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <div style={{ minHeight: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', borderTop: '1px solid #22252A' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>When I close the window</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Apps using Aurel Microphone keep working</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Apps using CABLE Output keep working</span>
                 </div>
                 <button
                   type="button"
@@ -237,13 +249,18 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               </div>
 
               <div style={{ minHeight: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', borderTop: '1px solid #22252A' }}>
-                <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Monitor through</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '10px 0' }}>
+                  <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Send my voice to</span>
+                  <span style={{ fontSize: '12px', color: isSendingToCable ? 'var(--text-tertiary)' : 'var(--accent-amber-text)' }}>{outputHint}</span>
+                </div>
                 <select
+                  aria-label="Send my voice to"
                   value={selectedOutputId}
                   onChange={(e) => onSelectOutputId(e.target.value)}
                   style={{
                     height: '36px',
                     minWidth: '260px',
+                    maxWidth: '340px',
                     borderRadius: '8px',
                     background: 'var(--bg-raised)',
                     border: '1px solid var(--border-strong)',
@@ -253,11 +270,42 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     fontSize: '13px',
                   }}
                 >
+                  <option value="">Nowhere yet</option>
                   {outputDevices.map((d) => (
                     <option key={d.deviceId} value={d.deviceId}>
-                      {d.label || 'Headphones (Realtek Audio)'}
+                      {d.label || 'Output device'}
                     </option>
                   ))}
+                </select>
+              </div>
+
+              <div style={{ minHeight: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '24px', borderTop: '1px solid #22252A' }}>
+                <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Monitor through</span>
+                <select
+                  aria-label="Monitor through"
+                  value={selectedMonitorId}
+                  onChange={(e) => onSelectMonitorId(e.target.value)}
+                  style={{
+                    height: '36px',
+                    minWidth: '260px',
+                    maxWidth: '340px',
+                    borderRadius: '8px',
+                    background: 'var(--bg-raised)',
+                    border: '1px solid var(--border-strong)',
+                    padding: '0 12px',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'inherit',
+                    fontSize: '13px',
+                  }}
+                >
+                  <option value="">Windows default output</option>
+                  {outputDevices
+                    .filter((d) => !isCablePlayback(d.label))
+                    .map((d) => (
+                      <option key={d.deviceId} value={d.deviceId}>
+                        {d.label || 'Headphones'}
+                      </option>
+                    ))}
                 </select>
               </div>
 

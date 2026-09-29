@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AudioDeviceOption } from '../types';
+import { CABLE_PLAYBACK_NAME, CABLE_RECORDING_NAME, findCablePlayback } from '../routing';
 
 interface VoiceCheckWizardProps {
   isOpen: boolean;
   onClose: () => void;
   inputDevices: AudioDeviceOption[];
+  outputDevices: AudioDeviceOption[];
   selectedInputId: string;
   onSelectInputId: (id: string) => void;
   onApplyProfile?: (profileId: string) => void;
@@ -14,13 +16,13 @@ export const VoiceCheckWizard: React.FC<VoiceCheckWizardProps> = ({
   isOpen,
   onClose,
   inputDevices,
+  outputDevices,
   selectedInputId,
   onSelectInputId,
   onApplyProfile,
 }) => {
   const [step, setStep] = useState<number>(1);
   const [manageVolume, setManageVolume] = useState<boolean>(true);
-  const [defaultMicSwitch, setDefaultMicSwitch] = useState<boolean>(true);
   const [selectedProfileId, setSelectedProfileId] = useState<string>('broadcast');
   const [previewMode, setPreviewMode] = useState<'original' | 'enhanced'>('enhanced');
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -48,6 +50,7 @@ export const VoiceCheckWizard: React.FC<VoiceCheckWizardProps> = ({
 
   const currentDevice = inputDevices.find((d) => d.deviceId === selectedInputId);
   const currentDeviceLabel = currentDevice?.label || 'USB Microphone';
+  const isCableInstalled = !!findCablePlayback(outputDevices);
 
   const profiles = [
     {
@@ -892,106 +895,65 @@ export const VoiceCheckWizard: React.FC<VoiceCheckWizardProps> = ({
                   Send your new voice to your apps
                 </h1>
                 <p style={{ margin: 0, maxWidth: '860px', fontSize: '16px', lineHeight: 1.55, color: '#B9BBC1' }}>
-                  Aurel adds a microphone to Windows called “Aurel Microphone”. Apps that use it hear your enhanced voice.
+                  Aurel sends your enhanced voice through VB-Audio Cable, a free virtual cable for Windows. In each app, choose <strong style={{ color: '#F3F2EF' }}>CABLE Output</strong> as the microphone.
                 </p>
               </div>
 
-              {/* Default mic banner */}
-              <section aria-label="Default microphone" style={{ display: 'flex', alignItems: 'center', gap: '28px', padding: '28px 32px', borderRadius: '18px', background: '#1C1810', border: '1px solid #4A3715' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: '#F5A623', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B1204" strokeWidth="1.8" strokeLinecap="round">
-                    <rect x="9" y="3" width="6" height="11" rx="3" />
-                    <path d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7" />
-                  </svg>
+              {/* VB-Cable status banner */}
+              <section aria-label="VB-Audio Cable" style={{ display: 'flex', alignItems: 'center', gap: '28px', padding: '28px 32px', borderRadius: '18px', background: isCableInstalled ? '#16181B' : '#1C1810', border: isCableInstalled ? '1px solid #24272C' : '1px solid #4A3715' }}>
+                <div style={{ width: '56px', height: '56px', borderRadius: '14px', background: isCableInstalled ? '#16301F' : '#F5A623', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {isCableInstalled ? (
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6BE3A4" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="m5 12 5 5 9-10" />
+                    </svg>
+                  ) : (
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B1204" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+                      <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+                    </svg>
+                  )}
                 </div>
                 <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '18px', fontWeight: 600 }}>Make Aurel the Windows default microphone</span>
-                    <span style={{ fontSize: '11px', fontWeight: 600, padding: '3px 8px', borderRadius: '6px', background: '#F5A623', color: '#1B1204' }}>Recommended</span>
+                  <span style={{ fontSize: '18px', fontWeight: 600 }}>
+                    {isCableInstalled ? 'VB-Audio Cable is installed' : 'Install VB-Audio Cable to reach your apps'}
                   </span>
-                  <span style={{ fontSize: '14px', lineHeight: 1.5, color: '#D8C9AE' }}>
-                    Most apps follow the Windows default, so they switch over on their own. You can undo this from Settings any time.
+                  <span style={{ fontSize: '14px', lineHeight: 1.5, color: isCableInstalled ? '#B9BBC1' : '#D8C9AE' }}>
+                    {isCableInstalled
+                      ? `Aurel plays your voice into ${CABLE_PLAYBACK_NAME}. Apps hear it on ${CABLE_RECORDING_NAME}.`
+                      : 'It’s free and takes about a minute. Run the installer as administrator, then restart your PC. Aurel finds the cable automatically.'}
                   </span>
                 </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={defaultMicSwitch}
-                  onClick={() => setDefaultMicSwitch(!defaultMicSwitch)}
-                  style={{
-                    width: '52px',
-                    height: '30px',
-                    borderRadius: '15px',
-                    background: defaultMicSwitch ? '#F5A623' : '#666A73',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: defaultMicSwitch ? 'flex-end' : 'flex-start',
-                    padding: '3px',
-                    boxSizing: 'border-box',
-                    flexShrink: 0,
-                    border: 0,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: defaultMicSwitch ? '#1B1204' : '#F3F2EF' }} />
-                </button>
+                {!isCableInstalled && (
+                  <button
+                    type="button"
+                    onClick={() => (window as any).studioAPI?.openVBCableFolder?.()}
+                    style={{ height: '44px', display: 'flex', alignItems: 'center', padding: '0 20px', borderRadius: '10px', background: '#F5A623', color: '#1B1204', fontSize: '14px', fontWeight: 600, border: 0, cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    Get VB-Cable
+                  </button>
+                )}
               </section>
 
-              {/* Apps we found 4-col */}
+              {/* Per-app instructions */}
               <section aria-labelledby="found-h" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                  <h2 id="found-h" style={{ margin: 0, fontSize: '17px', fontWeight: 600 }}>Apps we found</h2>
-                  <span style={{ fontSize: '13px', color: '#8C9098' }}>3 are ready. 1 needs a quick change, which we’ll walk you through later.</span>
+                  <h2 id="found-h" style={{ margin: 0, fontSize: '17px', fontWeight: 600 }}>Pick CABLE Output in each app</h2>
+                  <span style={{ fontSize: '13px', color: '#8C9098' }}>Also turn off the app’s own noise suppression. Aurel already does it.</span>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '16px' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', borderRadius: '14px', background: '#16181B', border: '1px solid #24272C' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ width: '40px', height: '40px', borderRadius: '11px', background: '#2B2E34', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>Te</span>
-                      <span style={{ fontSize: '15px', fontWeight: 600 }}>Microsoft Teams</span>
+                  {[
+                    { mono: 'Te', name: 'Microsoft Teams', path: 'Settings › Devices › Microphone' },
+                    { mono: 'Zo', name: 'Zoom Workplace', path: 'Settings › Audio › Microphone' },
+                    { mono: 'Ob', name: 'OBS Studio', path: 'Settings › Audio › Mic/Auxiliary Audio' },
+                    { mono: 'Di', name: 'Discord', path: 'User Settings › Voice & Video › Input Device' },
+                  ].map((a) => (
+                    <div key={a.mono} style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '20px', borderRadius: '14px', background: '#16181B', border: '1px solid #24272C' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ width: '40px', height: '40px', borderRadius: '11px', background: '#2B2E34', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>{a.mono}</span>
+                        <span style={{ fontSize: '15px', fontWeight: 600 }}>{a.name}</span>
+                      </div>
+                      <span style={{ fontSize: '13px', lineHeight: 1.5, color: '#B9BBC1' }}>{a.path}</span>
                     </div>
-                    <span style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', borderRadius: '999px', background: '#16301F', color: '#6BE3A4' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m5 12 5 5 9-10" />
-                      </svg>
-                      Ready
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', borderRadius: '14px', background: '#16181B', border: '1px solid #24272C' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ width: '40px', height: '40px', borderRadius: '11px', background: '#2B2E34', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>Zo</span>
-                      <span style={{ fontSize: '15px', fontWeight: 600 }}>Zoom Workplace</span>
-                    </div>
-                    <span style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', borderRadius: '999px', background: '#16301F', color: '#6BE3A4' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m5 12 5 5 9-10" />
-                      </svg>
-                      Ready
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', borderRadius: '14px', background: '#16181B', border: '1px solid #24272C' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ width: '40px', height: '40px', borderRadius: '11px', background: '#2B2E34', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>Ob</span>
-                      <span style={{ fontSize: '15px', fontWeight: 600 }}>OBS Studio</span>
-                    </div>
-                    <span style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: 600, padding: '5px 10px', borderRadius: '999px', background: '#16301F', color: '#6BE3A4' }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m5 12 5 5 9-10" />
-                      </svg>
-                      Ready
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px', borderRadius: '14px', background: '#16181B', border: '1px solid #24272C' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <span style={{ width: '40px', height: '40px', borderRadius: '11px', background: '#2B2E34', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>Di</span>
-                      <span style={{ fontSize: '15px', fontWeight: 600 }}>Discord</span>
-                    </div>
-                    <span style={{ alignSelf: 'flex-start', fontSize: '12px', fontWeight: 600, padding: '5px 10px', borderRadius: '999px', background: '#2A2111', color: '#FFC869' }}>
-                      Uses your mic directly · fix later
-                    </span>
-                  </div>
+                  ))}
                 </div>
               </section>
 
@@ -1007,7 +969,7 @@ export const VoiceCheckWizard: React.FC<VoiceCheckWizardProps> = ({
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8C9098" strokeWidth="2" strokeLinecap="round">
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
-                <span style={{ fontSize: '15px', fontWeight: 500, color: '#FFC869' }}>Aurel Microphone</span>
+                <span style={{ fontSize: '15px', fontWeight: 500, color: '#FFC869' }}>CABLE Output</span>
                 <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#B9BBC1' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                     <path d="M3 12h1M7 8v8M11 4v16M15 8v8M19 11v2" />
