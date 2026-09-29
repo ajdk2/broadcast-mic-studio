@@ -91,10 +91,11 @@ function showMain(tab?: string) {
 
 function createTrayWindow() {
   trayWindow = new BrowserWindow({
-    width: 400,
+    width: 384,
     height: 640,
     frame: false,
     transparent: true,
+    hasShadow: false,
     resizable: false,
     show: false,
     skipTaskbar: true,

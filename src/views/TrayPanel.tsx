@@ -42,8 +42,8 @@ export function TrayPanel() {
   );
 
   return (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'flex-end', padding: 20 }}>
-      <div role="dialog" aria-label="Aurel quick panel" className="col" style={{ width: 360, gap: 16, padding: 18, background: 'var(--bg-popover)', border: '1px solid var(--border-strong)', borderRadius: 14, boxShadow: 'var(--shadow)' }}>
+    <div style={{ height: '100%', display: 'flex', alignItems: 'flex-end', padding: 12 }}>
+      <div role="dialog" aria-label="Aurel quick panel" className="col" style={{ width: 360, gap: 16, padding: 18, background: 'var(--bg-popover)', border: '1px solid var(--border-strong)', borderRadius: 14 }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div className="row" style={{ gap: 12 }}>
             <Logo size={32} />
