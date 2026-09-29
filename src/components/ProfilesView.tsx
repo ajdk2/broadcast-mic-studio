@@ -1,813 +1,278 @@
-import React, { useState } from 'react';
-import { AurelProfile } from '../types';
+import React, { useEffect, useState } from 'react';
+import { useStudio } from '../state/store';
+import { NOISE_MODES, Profile, RULE_APPS, builtInById, curvePath, effectiveBands, fmtDb, modeForAmount, settingsEqual, signed } from '../voice/model';
+import { Icon, Switch } from '../ui/kit';
 
-interface ProfilesViewProps {
-  currentProfileId: string;
-  onSelectProfile: (profile: AurelProfile) => void;
-  onOpenSaveModal: () => void;
-  onOpenFineTune: () => void;
-  onOpenDeleteModal: (profileId: string) => void;
+function ago(ts: number): string {
+  if (!ts) return '';
+  const d = Math.floor((Date.now() - ts) / 86400000);
+  if (d <= 0) return 'Edited today';
+  if (d === 1) return 'Edited yesterday';
+  if (d < 7) return `Edited ${d} days ago`;
+  if (d < 14) return 'Edited last week';
+  return `Edited ${new Date(ts).toLocaleDateString()}`;
 }
 
-export const ProfilesView: React.FC<ProfilesViewProps> = ({
-  currentProfileId,
-  onSelectProfile,
-  onOpenSaveModal,
-  onOpenFineTune,
-  onOpenDeleteModal,
-}) => {
-  const [selectedProfileId, setSelectedProfileId] = useState<string>('stream');
+function stats(p: Profile, boostDb: number) {
+  const s = p.settings;
+  const nm = s.noise.enabled && s.noise.mode !== 'off' ? NOISE_MODES[modeForAmount(s.noise.amount)].label : 'Off';
+  const warm = s.eq.bands[1].gainDb + s.tone.warmthDb;
+  const pres = s.eq.bands[3].gainDb + s.tone.presenceDb;
+  return [
+    ['Voice Boost', fmtDb(boostDb, 0)],
+    ['Noise removal', nm],
+    ['Warmth', fmtDb(warm)],
+    ['Presence', fmtDb(pres)],
+    ['Compressor', s.compressor.enabled ? `${s.compressor.ratio} : 1` : 'Off'],
+    ['De-esser', s.deEsser.enabled ? fmtDb(s.deEsser.reductionDb, 0) : 'Off'],
+    ['Target', s.leveler.enabled ? `${signed(s.leveler.targetLufs, 0)} LUFS` : 'Leveler off'],
+    ['Analog warmth', s.warmth.enabled ? `${s.warmth.character[0].toUpperCase() + s.warmth.character.slice(1)} · ${s.warmth.drive}%` : 'Off'],
+  ];
+}
 
-  const C: Record<string, string> = {
-    broadcast: 'M0 30 C18 30 28 11 58 12 S108 25 140 25 S198 17 228 19 S254 27 260 29',
-    podcast: 'M0 33 C25 33 40 17 72 17 S120 23 150 22 S210 16 240 18 S258 25 260 27',
-    clear: 'M0 39 C20 39 34 27 60 25 S120 23 150 21 S190 9 215 11 S250 21 260 25',
-    condenser: 'M0 34 C30 34 50 24 90 24 S150 25 180 21 S230 8 260 7',
-    natural: 'M0 29 C30 26 60 24 130 24 S230 24 260 25',
-    stream: 'M0 28 C16 28 26 8 56 9 S106 26 138 26 S196 16 226 17 S254 25 260 27',
-    standup: 'M0 39 C20 39 36 29 62 27 S122 24 152 22 S192 12 216 13 S250 22 260 25',
+export function ProfilesView() {
+  const s = useStudio();
+  const [selId, setSelId] = useState(s.active.id);
+  const [renaming, setRenaming] = useState(false);
+  const [name, setName] = useState('');
+  const [capturing, setCapturing] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const sel = s.profiles.find((p) => p.id === selId) || s.active;
+  const inUse = sel.id === s.active.id;
+  const mine = s.profiles.filter((p) => !p.builtIn);
+  const builtIn = s.profiles.filter((p) => p.builtIn);
+  const factory = builtInById(sel.builtIn ? sel.id : sel.basedOn || '');
+  const isFactory = sel.builtIn && factory ? settingsEqual(sel.settings, factory.settings) : false;
+  // The selected profile's settings, or the live edits when it's the one in use.
+  const shown = inUse ? { ...sel, settings: s.working } : sel;
+
+  useEffect(() => {
+    if (!s.profiles.some((p) => p.id === selId)) setSelId(s.active.id);
+  }, [s.profiles, selId, s.active.id]);
+
+  // Press a digit to set the Ctrl + Alt shortcut.
+  useEffect(() => {
+    if (!capturing) return;
+    const onKey = (e: KeyboardEvent) => {
+      e.preventDefault();
+      if (e.key === 'Escape') setCapturing(false);
+      else if (e.key === 'Backspace' || e.key === 'Delete') {
+        s.patchProfile(sel.id, { shortcut: undefined });
+        setCapturing(false);
+      } else if (/^[0-9]$/.test(e.key)) {
+        s.patchProfile(sel.id, { shortcut: e.key });
+        setCapturing(false);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [capturing, sel.id, s]);
+
+  const flash = (m: string) => {
+    setMessage(m);
+    setTimeout(() => setMessage(null), 3000);
   };
 
-  const allProfiles = [
-    {
-      id: 'stream',
-      custom: true,
-      name: 'Late-night stream',
-      sub: 'From Broadcast · Ctrl Alt 1',
-      meta: 'Based on Broadcast · Edited 2 days ago',
-      key: '1',
-      rule: 'When OBS Studio starts streaming or recording',
-      ruleOn: true,
-      stats: [
-        { k: 'Voice Boost', v: '+30 dB' },
-        { k: 'Noise removal', v: 'Strong' },
-        { k: 'Warmth', v: '+3.6 dB' },
-        { k: 'Presence', v: '+1.2 dB' },
-        { k: 'Compressor', v: '4 : 1' },
-        { k: 'De-esser', v: '−5 dB' },
-        { k: 'Target', v: '−14 LUFS' },
-        { k: 'Analog warmth', v: 'Tape · 18%' },
-      ],
-    },
-    {
-      id: 'standup',
-      custom: true,
-      name: 'Morning standup',
-      sub: 'From Clear Speech · Ctrl Alt 2',
-      meta: 'Based on Clear Speech · Edited last week',
-      key: '2',
-      rule: 'When Microsoft Teams joins a meeting',
-      ruleOn: true,
-      stats: [
-        { k: 'Voice Boost', v: '+24 dB' },
-        { k: 'Noise removal', v: 'Balanced' },
-        { k: 'Warmth', v: '−0.6 dB' },
-        { k: 'Presence', v: '+3.0 dB' },
-        { k: 'Compressor', v: '3 : 1' },
-        { k: 'De-esser', v: '−4 dB' },
-        { k: 'Target', v: '−16 LUFS' },
-        { k: 'Analog warmth', v: 'Tape · 18%' },
-      ],
-    },
-    {
-      id: 'broadcast',
-      custom: false,
-      name: 'Broadcast',
-      sub: 'Deep and controlled · Ctrl Alt 3',
-      meta: 'Built in · Your Voice Boost is kept when you switch',
-      key: '3',
-      rule: 'No rules yet. Add one to switch when an app starts.',
-      ruleOn: false,
-      stats: [
-        { k: 'Voice Boost', v: '+26 dB' },
-        { k: 'Noise removal', v: 'Balanced' },
-        { k: 'Warmth', v: '+1.4 dB' },
-        { k: 'Presence', v: '−0.2 dB' },
-        { k: 'Compressor', v: '3 : 1' },
-        { k: 'De-esser', v: '−4 dB' },
-        { k: 'Target', v: '−16 LUFS' },
-        { k: 'Analog warmth', v: 'Tape · 18%' },
-      ],
-    },
-    {
-      id: 'podcast',
-      custom: false,
-      name: 'Podcast',
-      sub: 'Rich and even · Ctrl Alt 4',
-      meta: 'Built in · Your Voice Boost is kept when you switch',
-      key: '4',
-      rule: 'No rules yet. Add one to switch when an app starts.',
-      ruleOn: false,
-      stats: [
-        { k: 'Voice Boost', v: '+24 dB' },
-        { k: 'Noise removal', v: 'Balanced' },
-        { k: 'Warmth', v: '+2.0 dB' },
-        { k: 'Presence', v: '+1.0 dB' },
-        { k: 'Compressor', v: '2.5 : 1' },
-        { k: 'De-esser', v: '−3 dB' },
-        { k: 'Target', v: '−16 LUFS' },
-        { k: 'Analog warmth', v: 'Tube · 12%' },
-      ],
-    },
-    {
-      id: 'clear',
-      custom: false,
-      name: 'Clear Speech',
-      sub: 'Crisp for meetings · Ctrl Alt 5',
-      meta: 'Built in · Your Voice Boost is kept when you switch',
-      key: '5',
-      rule: 'No rules yet. Add one to switch when an app starts.',
-      ruleOn: false,
-      stats: [
-        { k: 'Voice Boost', v: '+20 dB' },
-        { k: 'Noise removal', v: 'Light' },
-        { k: 'Warmth', v: '−1.0 dB' },
-        { k: 'Presence', v: '+3.5 dB' },
-        { k: 'Compressor', v: '3 : 1' },
-        { k: 'De-esser', v: '−4 dB' },
-        { k: 'Target', v: '−18 LUFS' },
-        { k: 'Analog warmth', v: 'Console · 10%' },
-      ],
-    },
-    {
-      id: 'condenser',
-      custom: false,
-      name: 'Studio Condenser',
-      sub: 'Airy and detailed · Ctrl Alt 6',
-      meta: 'Built in · Your Voice Boost is kept when you switch',
-      key: '6',
-      rule: 'No rules yet. Add one to switch when an app starts.',
-      ruleOn: false,
-      stats: [
-        { k: 'Voice Boost', v: '+22 dB' },
-        { k: 'Noise removal', v: 'Light' },
-        { k: 'Warmth', v: '+0.5 dB' },
-        { k: 'Presence', v: '+2.5 dB' },
-        { k: 'Compressor', v: '2 : 1' },
-        { k: 'De-esser', v: '−3 dB' },
-        { k: 'Target', v: '−16 LUFS' },
-        { k: 'Analog warmth', v: 'Tape · 14%' },
-      ],
-    },
-    {
-      id: 'natural',
-      custom: false,
-      name: 'Natural',
-      sub: 'Light cleanup · Ctrl Alt 7',
-      meta: 'Built in · Your Voice Boost is kept when you switch',
-      key: '7',
-      rule: 'No rules yet. Add one to switch when an app starts.',
-      ruleOn: false,
-      stats: [
-        { k: 'Voice Boost', v: '+16 dB' },
-        { k: 'Noise removal', v: 'Light' },
-        { k: 'Warmth', v: '0.0 dB' },
-        { k: 'Presence', v: '0.0 dB' },
-        { k: 'Compressor', v: '1.5 : 1' },
-        { k: 'De-esser', v: '−2 dB' },
-        { k: 'Target', v: '−20 LUFS' },
-        { k: 'Analog warmth', v: 'Off' },
-      ],
-    },
-  ];
-
-  const sel = allProfiles.find((p) => p.id === selectedProfileId) || allProfiles[0];
-  const inUse = currentProfileId === sel.id;
-
-  const handleUseThisProfile = () => {
-    onSelectProfile({
-      id: sel.id,
-      name: sel.name,
-      desc: sel.sub,
-      tags: '',
-      curve: C[sel.id] || C.broadcast,
-      isBuiltIn: !sel.custom,
-    });
+  const row = (p: Profile) => {
+    const active = p.id === s.active.id;
+    const sub = p.builtIn ? `${p.description.split('.')[0]}${p.shortcut ? ` · Ctrl Alt ${p.shortcut}` : ''}` : `From ${builtInById(p.basedOn || '')?.name || 'your settings'}${p.shortcut ? ` · Ctrl Alt ${p.shortcut}` : ''}`;
+    return (
+      <button key={p.id} className="row" aria-current={p.id === sel.id ? 'true' : undefined} onClick={() => { setSelId(p.id); setRenaming(false); }} style={{ position: 'relative', height: 64, flexShrink: 0, gap: 14, padding: '0 12px', borderRadius: 10, textAlign: 'left', background: p.id === sel.id ? 'var(--bg-raised)' : 'transparent' }}>
+        {p.id === sel.id && <span style={{ position: 'absolute', left: 0, top: 18, bottom: 18, width: 3, borderRadius: 2, background: 'var(--accent)' }} />}
+        <svg width="64" height="28" viewBox="0 0 64 28" aria-hidden="true" style={{ borderRadius: 6, background: 'var(--bg-inset)' }}>
+          <path d={curvePath(effectiveBands(p.settings), 64, 28, 10, 32)} fill="none" stroke={active ? 'var(--accent)' : 'var(--meter-raw)'} strokeWidth="1.6" />
+        </svg>
+        <span className="col grow" style={{ gap: 3 }}>
+          <span className="ellipsis" style={{ fontSize: 14, fontWeight: 500 }}>{p.name}</span>
+          <span className="xsmall faint ellipsis">{sub}</span>
+        </span>
+        {active && <span className="badge" style={{ background: 'var(--success-tint)', color: 'var(--success-text)' }}>In use</span>}
+      </button>
+    );
   };
 
   return (
-    <div
-      style={{
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px',
-        padding: '30px 40px 28px',
-        boxSizing: 'border-box',
-      }}
-    >
-        {/* Top Header (Height 60px) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-              Profiles
-            </h1>
-            <span style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>
-              A profile saves every setting in the voice chain. Switch with a shortcut, or let Aurel switch for you.
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              type="button"
-              style={{
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 16px',
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border-strong)',
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: 500,
-                color: 'var(--text-primary)',
-              }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 15V3M7 10l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-              </svg>
-              Import .aurel file
-            </button>
-
-            <button
-              type="button"
-              onClick={onOpenSaveModal}
-              style={{
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 18px',
-                background: 'var(--accent-amber)',
-                border: 0,
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: 600,
-                color: '#1B1204',
-              }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              New profile
-            </button>
-          </div>
+    <div className="page">
+      <div className="page-head">
+        <div className="col" style={{ gap: 6 }}>
+          <h1 className="h1">Profiles</h1>
+          <span className="faint">A profile saves every setting in the voice chain. Switch with a shortcut, or let Aurel switch for you.</span>
         </div>
-
-        {/* 2-column Layout */}
-        <div style={{ flexGrow: 1, display: 'flex', gap: '24px', minHeight: 0 }}>
-          {/* Left Navigation (Width 420px) */}
-          <nav
-            aria-label="Profiles"
-            style={{
-              width: '420px',
-              flexShrink: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              padding: '18px 12px',
-              boxSizing: 'border-box',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-              overflowY: 'auto',
+        <div className="row" style={{ gap: 10 }}>
+          {message && <span className="small" role="status" style={{ color: 'var(--accent-text)' }}>{message}</span>}
+          <button
+            className="btn"
+            onClick={async () => {
+              try {
+                const p = await s.importProfile();
+                if (p) { setSelId(p.id); flash(`Imported “${p.name}”`); }
+              } catch (e) {
+                flash((e as Error).message);
+              }
             }}
           >
-            <span
-              style={{
-                padding: '4px 12px 8px',
-                fontSize: '11px',
-                fontWeight: 600,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'var(--text-tertiary)',
-              }}
-            >
-              Yours
-            </span>
-            {allProfiles.filter((p) => p.custom).map((p) => {
-              const isSel = selectedProfileId === p.id;
-              const isCurrent = currentProfileId === p.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedProfileId(p.id)}
-                  style={{
-                    position: 'relative',
-                    height: '64px',
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                    padding: '0 12px',
-                    border: 0,
-                    borderRadius: '10px',
-                    background: isSel ? 'var(--bg-raised)' : 'transparent',
-                    borderLeft: isSel ? '1px solid var(--border-hover)' : 'none',
-                    textAlign: 'left',
-                    width: '100%',
-                    transition: 'background 0.12s ease',
-                  }}
-                >
-                  {isSel && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        borderRadius: '10px',
-                        background: 'var(--bg-raised)',
-                        border: '1px solid var(--border-hover)',
-                        pointerEvents: 'none',
-                      }}
-                    />
-                  )}
-                  <svg width="64" height="28" viewBox="0 0 260 40" preserveAspectRatio="none" aria-hidden="true" style={{ position: 'relative', flexShrink: 0 }}>
-                    <path d={C[p.id]} fill="none" stroke={isSel ? 'var(--accent-amber)' : 'var(--text-tertiary)'} strokeWidth="5" strokeLinecap="round" />
-                  </svg>
-                  <span style={{ position: 'relative', flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>{p.name}</span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{p.sub}</span>
-                  </span>
-                  {isCurrent && (
-                    <span
-                      style={{
-                        position: 'relative',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        background: 'var(--accent-amber-tint)',
-                        color: 'var(--accent-amber-text)',
-                      }}
-                    >
-                      In use
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+            <Icon name="upload" size={15} />
+            Import .aurel file
+          </button>
+          <button className="btn btn-primary" onClick={() => s.openModal({ saveProfile: true })}>
+            <Icon name="plus" size={15} />
+            New profile
+          </button>
+        </div>
+      </div>
 
-            <span
-              style={{
-                padding: '16px 12px 8px',
-                fontSize: '11px',
-                fontWeight: 600,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: 'var(--text-tertiary)',
-              }}
-            >
-              Built in
-            </span>
-            {allProfiles.filter((p) => !p.custom).map((p) => {
-              const isSel = selectedProfileId === p.id;
-              const isCurrent = currentProfileId === p.id;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setSelectedProfileId(p.id)}
-                  style={{
-                    position: 'relative',
-                    height: '64px',
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                    padding: '0 12px',
-                    border: 0,
-                    borderRadius: '10px',
-                    background: isSel ? 'var(--bg-raised)' : 'transparent',
-                    textAlign: 'left',
-                    width: '100%',
-                    transition: 'background 0.12s ease',
-                  }}
-                >
-                  {isSel && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        borderRadius: '10px',
-                        background: 'var(--bg-raised)',
-                        border: '1px solid var(--border-hover)',
-                        pointerEvents: 'none',
-                      }}
-                    />
-                  )}
-                  <svg width="64" height="28" viewBox="0 0 260 40" preserveAspectRatio="none" aria-hidden="true" style={{ position: 'relative', flexShrink: 0 }}>
-                    <path d={C[p.id]} fill="none" stroke={isSel ? 'var(--accent-amber)' : 'var(--text-tertiary)'} strokeWidth="5" strokeLinecap="round" />
-                  </svg>
-                  <span style={{ position: 'relative', flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>{p.name}</span>
-                    <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{p.sub}</span>
-                  </span>
-                  {isCurrent && (
-                    <span
-                      style={{
-                        position: 'relative',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        padding: '3px 8px',
-                        borderRadius: '6px',
-                        background: 'var(--accent-amber-tint)',
-                        color: 'var(--accent-amber-text)',
-                      }}
-                    >
-                      In use
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+      <div style={{ flexGrow: 1, display: 'flex', gap: 24, minHeight: 0 }}>
+        <nav aria-label="Profiles" className="card col" style={{ width: 420, flexShrink: 0, gap: 4, padding: 18, overflow: 'auto' }}>
+          <span className="overline" style={{ padding: '4px 12px 8px' }}>Yours</span>
+          {mine.length ? mine.map(row) : <span className="small faint" style={{ padding: '4px 12px 8px' }}>Profiles you save appear here.</span>}
+          <span className="overline" style={{ padding: '16px 12px 8px' }}>Built in</span>
+          {builtIn.map(row)}
+        </nav>
 
-          {/* Right Profile Details */}
-          <section
-            aria-labelledby="pd-h"
-            style={{
-              flexGrow: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '22px',
-              padding: '28px 32px',
-              boxSizing: 'border-box',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-              minWidth: 0,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '24px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <h2 id="pd-h" style={{ margin: 0, fontSize: '26px', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-                    {sel.name}
-                  </h2>
-                  {sel.custom ? (
-                    <button
-                      type="button"
-                      aria-label="Rename profile"
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRadius: '8px',
-                        background: 'transparent',
-                        border: 0,
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                        <path d="M4 20h4L19 9l-4-4L4 16v4z" />
-                        <path d="m13.5 6.5 4 4" />
-                      </svg>
-                    </button>
-                  ) : (
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        fontSize: '12px',
-                        fontWeight: 500,
-                        padding: '4px 10px',
-                        borderRadius: '999px',
-                        background: 'var(--bg-control)',
-                        color: 'var(--text-secondary)',
-                      }}
-                    >
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                        <rect x="5" y="11" width="14" height="10" rx="2" />
-                        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-                      </svg>
-                      Built in
-                    </span>
-                  )}
-                </div>
-                <span style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>{sel.meta}</span>
-              </div>
-
-              <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
-                <button
-                  type="button"
-                  onClick={onOpenFineTune}
-                  style={{
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 16px',
-                    borderRadius: '10px',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border-strong)',
-                    boxSizing: 'border-box',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  Edit in Fine-tune
-                </button>
-
-                {inUse ? (
-                  <span
-                    style={{
-                      height: '40px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '0 16px',
-                      borderRadius: '10px',
-                      background: 'var(--accent-amber-tint)',
-                      color: 'var(--accent-amber-text)',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      boxSizing: 'border-box',
+        <section aria-labelledby="pd-h" className="card col grow" style={{ gap: 22, padding: '28px 32px', overflow: 'auto' }}>
+          <div className="row" style={{ alignItems: 'flex-start', justifyContent: 'space-between', gap: 24 }}>
+            <div className="col" style={{ gap: 8, minWidth: 0 }}>
+              <div className="row" style={{ gap: 10 }}>
+                {renaming ? (
+                  <form
+                    className="row"
+                    style={{ gap: 8 }}
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (name.trim()) s.patchProfile(sel.id, { name: name.trim().slice(0, 60) });
+                      setRenaming(false);
                     }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="m5 12 5 5 9-10" />
-                    </svg>
-                    In use now
-                  </span>
+                    <input autoFocus className="text-input" style={{ width: 320, fontSize: 20, fontWeight: 600 }} value={name} aria-label="Profile name" maxLength={60} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Escape' && setRenaming(false)} />
+                    <button className="btn btn-primary" type="submit">Save</button>
+                  </form>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={handleUseThisProfile}
-                    style={{
-                      height: '40px',
-                      padding: '0 18px',
-                      borderRadius: '10px',
-                      background: 'var(--accent-amber)',
-                      border: 0,
-                      color: '#1B1204',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                    }}
-                  >
-                    Use this profile
+                  <h2 id="pd-h" style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.02em' }}>{sel.name}</h2>
+                )}
+                {!sel.builtIn && !renaming && (
+                  <button className="icon-btn" aria-label="Rename profile" onClick={() => { setName(sel.name); setRenaming(true); }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z" /></svg>
                   </button>
                 )}
+                {sel.builtIn && <span className="chip"><Icon name="lock" size={12} />Built in</span>}
               </div>
+              <span className="faint">
+                {sel.builtIn ? sel.description : `Based on ${factory?.name || 'your settings'} · ${ago(sel.updatedAt)}`}
+                {inUse && s.edited ? ' · has unsaved edits' : ''}
+              </span>
             </div>
-
-            {/* Sound signature card */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                padding: '18px 20px',
-                borderRadius: '12px',
-                background: '#111215',
-                border: '1px solid #22252A',
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-tertiary)' }}>
-                <span>Sound signature</span>
-                <span className="mono">20 Hz · 200 Hz · 2 kHz · 20 kHz</span>
-              </div>
-              <svg width="100%" height="120" viewBox="0 0 260 40" preserveAspectRatio="none" aria-hidden="true">
-                <line x1="0" y1="24" x2="260" y2="24" stroke="#2A2D33" strokeWidth="0.4" strokeDasharray="1 1.5" />
-                <path d={C[sel.id]} fill="none" stroke="var(--accent-amber)" strokeWidth="0.9" strokeLinecap="round" />
-              </svg>
-            </div>
-
-            {/* 8 Stats cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '12px' }}>
-              {sel.stats.map((t) => (
-                <div
-                  key={t.k}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px',
-                    padding: '14px 16px',
-                    borderRadius: '10px',
-                    background: '#1B1D21',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>{t.k}</span>
-                  <span className="mono" style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t.v}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Rules and shortcut */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '20px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Switch to this profile automatically
-                </span>
-                <div
-                  style={{
-                    minHeight: '56px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '16px',
-                    padding: '0 16px',
-                    borderRadius: '10px',
-                    background: '#1B1D21',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{sel.rule}</span>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={sel.ruleOn}
-                    aria-label="Automatic switching rule"
-                    style={{
-                      width: '40px',
-                      height: '24px',
-                      borderRadius: '12px',
-                      background: sel.ruleOn ? 'var(--accent-amber)' : '#666A73',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: sel.ruleOn ? 'flex-end' : 'flex-start',
-                      padding: '3px',
-                      boxSizing: 'border-box',
-                      flexShrink: 0,
-                      border: 0,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: sel.ruleOn ? '#1B1204' : '#B9BBC1' }} />
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  style={{
-                    alignSelf: 'flex-start',
-                    height: '34px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '0 12px',
-                    borderRadius: '8px',
-                    background: 'transparent',
-                    border: '1px dashed #3A3E46',
-                    fontSize: '12px',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                  Add a rule
-                </button>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Shortcut</span>
-                <div
-                  style={{
-                    minHeight: '56px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 16px',
-                    borderRadius: '10px',
-                    background: '#1B1D21',
-                    border: '1px solid var(--border-subtle)',
-                  }}
-                >
-                  <span style={{ display: 'flex', gap: '4px' }}>
-                    <kbd className="mono" style={{ height: '28px', padding: '0 8px', display: 'flex', alignItems: 'center', borderRadius: '6px', background: 'var(--bg-control)', border: '1px solid var(--border-hover)', borderBottomWidth: '2px', fontSize: '12px' }}>Ctrl</kbd>
-                    <kbd className="mono" style={{ height: '28px', padding: '0 8px', display: 'flex', alignItems: 'center', borderRadius: '6px', background: 'var(--bg-control)', border: '1px solid var(--border-hover)', borderBottomWidth: '2px', fontSize: '12px' }}>Alt</kbd>
-                    <kbd className="mono" style={{ height: '28px', padding: '0 8px', display: 'flex', alignItems: 'center', borderRadius: '6px', background: 'var(--bg-control)', border: '1px solid var(--border-hover)', borderBottomWidth: '2px', fontSize: '12px' }}>{sel.key}</kbd>
-                  </span>
-                  <button
-                    type="button"
-                    style={{
-                      height: '30px',
-                      padding: '0 10px',
-                      borderRadius: '6px',
-                      background: 'transparent',
-                      border: 0,
-                      fontSize: '12px',
-                      fontWeight: 500,
-                      color: 'var(--accent-amber)',
-                    }}
-                  >
-                    Change
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom Actions Bar */}
-            <div
-              style={{
-                marginTop: 'auto',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                paddingTop: '18px',
-                borderTop: '1px solid var(--border-subtle)',
-              }}
-            >
-              <button
-                type="button"
-                style={{
-                  height: '38px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '0 14px',
-                  borderRadius: '10px',
-                  background: 'transparent',
-                  border: '1px solid var(--border-strong)',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  color: 'var(--text-primary)',
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect x="9" y="9" width="11" height="11" rx="2" />
-                  <path d="M5 15V5a1 1 0 0 1 1-1h10" />
-                </svg>
-                Duplicate
-              </button>
-
-              <button
-                type="button"
-                style={{
-                  height: '38px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '0 14px',
-                  borderRadius: '10px',
-                  background: 'transparent',
-                  border: '1px solid var(--border-strong)',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  color: 'var(--text-primary)',
-                }}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M12 3v12M7 8l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-                </svg>
-                Export as file
-              </button>
-
-              {!sel.custom && (
-                <button
-                  type="button"
-                  style={{
-                    height: '38px',
-                    padding: '0 14px',
-                    borderRadius: '10px',
-                    background: 'transparent',
-                    border: '1px solid var(--border-strong)',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                    color: 'var(--text-primary)',
-                  }}
-                >
-                  Reset to original
-                </button>
-              )}
-
-              {sel.custom && (
-                <button
-                  type="button"
-                  onClick={() => onOpenDeleteModal(sel.id)}
-                  style={{
-                    marginLeft: 'auto',
-                    height: '38px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '0 14px',
-                    borderRadius: '10px',
-                    background: 'transparent',
-                    border: '1px solid #5C2A24',
-                    color: '#FF8A7E',
-                    fontSize: '13px',
-                    fontWeight: 500,
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
-                  </svg>
-                  Delete profile
-                </button>
+            <div className="row" style={{ gap: 10, flexShrink: 0 }}>
+              <button className="btn" onClick={() => { if (!inUse) s.selectProfile(sel.id); s.setTab('finetune'); }}>Edit in Fine-tune</button>
+              {inUse ? (
+                <span className="chip chip-ok" style={{ height: 40, padding: '0 16px', fontSize: 13 }}><Icon name="check" size={14} strokeWidth={2.6} />In use now</span>
+              ) : (
+                <button className="btn btn-primary" onClick={() => s.selectProfile(sel.id)}>Use this profile</button>
               )}
             </div>
-          </section>
-        </div>
+          </div>
+
+          <div className="inset col" style={{ gap: 8, padding: '18px 20px', borderRadius: 12 }}>
+            <div className="row xsmall faint" style={{ justifyContent: 'space-between' }}><span>Sound signature</span><span className="mono">20 Hz · 200 Hz · 2 kHz · 20 kHz</span></div>
+            <svg width="100%" height="96" viewBox="0 0 800 96" preserveAspectRatio="none" role="img" aria-label={`${sel.name} EQ curve`}>
+              <line x1={0} x2={800} y1={48} y2={48} stroke="var(--border-row)" vectorEffect="non-scaling-stroke" />
+              <path d={curvePath(effectiveBands(shown.settings), 800, 96, 10, 120)} fill="none" stroke="var(--accent)" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
+            </svg>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12 }}>
+            {stats(shown, s.live.boostDb).map(([k, v]) => (
+              <div key={k} className="inset col" style={{ gap: 6, padding: '14px 16px' }}>
+                <span className="xsmall faint">{k}</span>
+                <span className="mono" style={{ fontSize: 15, fontWeight: 500 }}>{v}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 20 }}>
+            <RuleEditor profile={sel} />
+            <div className="col" style={{ gap: 10 }}>
+              <span className="h3">Shortcut</span>
+              <div className="inset row" style={{ minHeight: 56, justifyContent: 'space-between', padding: '0 12px 0 16px', borderRadius: 12 }}>
+                {capturing ? (
+                  <span className="small" style={{ color: 'var(--accent-text)' }}>Press a number key 0–9 · Backspace clears · Esc cancels</span>
+                ) : sel.shortcut ? (
+                  <span className="row" style={{ gap: 4 }}><kbd>Ctrl</kbd><kbd>Alt</kbd><kbd>{sel.shortcut}</kbd></span>
+                ) : (
+                  <span className="small faint">No shortcut</span>
+                )}
+                <button className="btn btn-ghost btn-sm" onClick={() => setCapturing(!capturing)}>{capturing ? 'Cancel' : sel.shortcut ? 'Change' : 'Set'}</button>
+              </div>
+              <span className="xsmall faint">Works in any app, even full screen.</span>
+            </div>
+          </div>
+
+          <div className="row" style={{ marginTop: 'auto', gap: 10, paddingTop: 18, borderTop: '1px solid var(--border-subtle)' }}>
+            <button className="btn" onClick={async () => { const p = await s.duplicateProfile(sel.id); setSelId(p.id); flash(`Made “${p.name}”`); }}>
+              <Icon name="copy" size={15} />Duplicate
+            </button>
+            <button className="btn" onClick={async () => { if (await s.exportProfile(sel.id)) flash('Saved to file'); }}>
+              <Icon name="download" size={15} />Export as file
+            </button>
+            {factory && !(sel.builtIn && isFactory) && (
+              <button className="btn btn-ghost" style={{ border: '1px solid var(--border-strong)' }} onClick={() => s.resetProfile(sel.id)}>
+                Reset to original{!sel.builtIn ? ` ${factory.name}` : ''}
+              </button>
+            )}
+            {!sel.builtIn && (
+              <button className="btn btn-ghost" style={{ marginLeft: 'auto', color: 'var(--error-text)' }} onClick={() => s.openModal({ deleteProfileId: sel.id })}>
+                <Icon name="trash" size={15} />Delete profile
+              </button>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
-};
+}
+
+function RuleEditor({ profile }: { profile: Profile }) {
+  const s = useStudio();
+  const [adding, setAdding] = useState(false);
+  const rule = profile.rule;
+  return (
+    <div className="col" style={{ gap: 10 }}>
+      <span className="h3">Switch to this profile automatically</span>
+      {rule && !adding ? (
+        <div className="inset row" style={{ minHeight: 56, justifyContent: 'space-between', gap: 16, padding: '0 16px', borderRadius: 12 }}>
+          <span className="small muted">When {rule.app} is open</span>
+          <div className="row" style={{ gap: 8 }}>
+            <button className="btn btn-ghost btn-sm" onClick={() => s.patchProfile(profile.id, { rule: undefined })}>Remove</button>
+            <Switch small label="Automatic switching rule" checked={rule.enabled} onChange={(v) => s.patchProfile(profile.id, { rule: { ...rule, enabled: v } })} />
+          </div>
+        </div>
+      ) : adding ? (
+        <div className="inset row" style={{ minHeight: 56, gap: 10, padding: '0 12px 0 16px', borderRadius: 12 }}>
+          <span className="small muted">When</span>
+          <select
+            className="select"
+            aria-label="App that switches to this profile"
+            defaultValue=""
+            onChange={(e) => {
+              const app = RULE_APPS.find((a) => a.exe === e.target.value);
+              if (app) s.patchProfile(profile.id, { rule: { ...app, enabled: true } });
+              setAdding(false);
+            }}
+          >
+            <option value="" disabled>Choose an app…</option>
+            {RULE_APPS.map((a) => <option key={a.exe} value={a.exe}>{a.app}</option>)}
+          </select>
+          <span className="small muted">is open</span>
+          <button className="btn btn-ghost btn-sm" style={{ marginLeft: 'auto' }} onClick={() => setAdding(false)}>Cancel</button>
+        </div>
+      ) : (
+        <span className="small faint">Aurel can switch to this profile when an app opens, and back when it closes.</span>
+      )}
+      {!adding && !rule && (
+        <button className="btn btn-sm" style={{ alignSelf: 'flex-start', height: 34 }} onClick={() => setAdding(true)}>
+          <Icon name="plus" size={14} />Add a rule
+        </button>
+      )}
+      {!window.studioAPI && rule && <span className="xsmall faint">Rules only run in the Aurel desktop app.</span>}
+    </div>
+  );
+}
