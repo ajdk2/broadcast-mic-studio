@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TitleBar } from './components/TitleBar';
 import { Sidebar } from './components/Sidebar';
 import { StudioView } from './components/StudioView';
@@ -10,503 +10,295 @@ import { TestSoundModal } from './components/TestSoundModal';
 import { SaveProfileModal } from './components/SaveProfileModal';
 import { DeleteProfileModal } from './components/DeleteProfileModal';
 import { VoiceCheckWizard } from './components/VoiceCheckWizard';
-import { TrayQuickPanelModal } from './components/TrayQuickPanelModal';
-import { NotificationsDrawer } from './components/NotificationsDrawer';
-import { dspEngine } from './audio/dspEngine';
-import { AUREL_PROFILES, BASE_DSP_PARAMS, MIC_CORRECTION_MODELS, NOISE_MAP } from './presets';
-import {
-  AudioDeviceOption,
-  AurelProfile,
-  DSPParameters,
-  HeadphonePreviewMode,
-  MeterData,
-  NavigationTab,
-  NoiseCleanupMode,
-} from './types';
+import { InPageNotifications } from './components/NotificationsDrawer';
+import { EngineProblem } from './components/EngineProblem';
+import { FirstRunTour } from './components/FirstRunTour';
+import { engine } from './audio/engine';
+import { StudioProvider, Studio, Tab, useMeters, useStudio } from './state/store';
+import { Command } from './state/notifications';
+import { NOISE_MODES, NoiseMode, setNoiseMode } from './voice/model';
+import { useTheme } from './ui/useTheme';
+import { useCpu } from './ui/useCpu';
 
 export default function App() {
-  // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<NavigationTab>('studio');
-
-  // Master Sound Engine States
-  const [isEnhancementOn, setIsEnhancementOn] = useState<boolean>(true);
-  const [headphoneView, setHeadphoneView] = useState<HeadphonePreviewMode>('enhanced');
-  const [isMonitoring, setIsMonitoring] = useState<boolean>(false);
-  const [monitorVolume, setMonitorVolume] = useState<number>(0.85);
-
-  // Aurel Studio Quick Sliders
-  const [boost, setBoost] = useState<number>(68); // 0..100 (maps to +26 dB)
-  const [warmth, setWarmth] = useState<number>(62); // 0..100 (maps to +1.4 dB)
-  const [presence, setPresence] = useState<number>(48); // 0..100 (maps to -0.2 dB)
-  const [noise, setNoise] = useState<NoiseCleanupMode>('balanced');
-  const [selectedMicModel, setSelectedMicModel] = useState<string>('none');
-
-  // Profiles State
-  const [profiles, setProfiles] = useState<AurelProfile[]>(AUREL_PROFILES);
-  const [currentProfileId, setCurrentProfileId] = useState<string>('broadcast');
-
-  // Fine-tune parameter overrides
-  const [customParams, setCustomParams] = useState<DSPParameters>(BASE_DSP_PARAMS);
-
-  // Audio Hardware Devices
-  const [inputDevices, setInputDevices] = useState<AudioDeviceOption[]>([]);
-  const [outputDevices, setOutputDevices] = useState<AudioDeviceOption[]>([]);
-  const [selectedInputId, setSelectedInputId] = useState<string>('');
-  const [selectedOutputId, setSelectedOutputId] = useState<string>('');
-  const [selectedMonitorId, setSelectedMonitorId] = useState<string>('');
-  const [bufferSize, setBufferSize] = useState<number>(128);
-
-  // Real-time meter data from Web Audio
-  const [meterData, setMeterData] = useState<MeterData | null>(null);
-
-  // Modals & Overlays
-  const [isTestSoundOpen, setIsTestSoundOpen] = useState<boolean>(false);
-  const [isSaveProfileOpen, setIsSaveProfileOpen] = useState<boolean>(false);
-  const [isVoiceCheckOpen, setIsVoiceCheckOpen] = useState<boolean>(false);
-  const [deleteProfileId, setDeleteProfileId] = useState<string | null>(null);
-  const [isTrayQuickPanelOpen, setIsTrayQuickPanelOpen] = useState<boolean>(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState<boolean>(false);
-  const [theme, setTheme] = useState<'dark' | 'light' | 'system'>('dark');
-
-  // Theme synchronization with document element
-  useEffect(() => {
-    if (theme === 'light') {
-      document.documentElement.classList.add('theme-light');
-    } else {
-      document.documentElement.classList.remove('theme-light');
-    }
-  }, [theme]);
-
-  // Load profiles and settings from SQLite on startup
-  useEffect(() => {
-    const loadFromDb = async () => {
-      if ((window as any).studioAPI?.getPresets) {
-        try {
-          const dbPresets = await (window as any).studioAPI.getPresets();
-          if (dbPresets && dbPresets.length > 0) {
-            setProfiles((prev) => {
-              const customOnly = dbPresets.filter((p: any) => !AUREL_PROFILES.some((ap) => ap.id === p.id));
-              return [...AUREL_PROFILES, ...customOnly];
-            });
-          }
-        } catch (e) {
-          console.warn('Could not load SQLite presets:', e);
-        }
-      }
-    };
-    loadFromDb();
-  }, []);
-
-  // Enumerate hardware devices
-  const refreshDevices = useCallback(async () => {
-    try {
-      if (!navigator.mediaDevices?.enumerateDevices) return;
-      const devices = await navigator.mediaDevices.enumerateDevices();
-
-      const ins: AudioDeviceOption[] = devices
-        .filter((d) => d.kind === 'audioinput')
-        .map((d) => ({
-          deviceId: d.deviceId,
-          label: d.label || 'Default Microphone',
-          kind: 'audioinput',
-        }));
-
-      const outs: AudioDeviceOption[] = devices
-        .filter((d) => d.kind === 'audiooutput')
-        .map((d) => ({
-          deviceId: d.deviceId,
-          label: d.label || 'Default Output',
-          kind: 'audiooutput',
-        }));
-
-      setInputDevices(ins);
-      setOutputDevices(outs);
-
-      if (ins.length > 0 && !selectedInputId) {
-        setSelectedInputId(ins[0].deviceId);
-      }
-    } catch (err) {
-      console.warn('Device enumeration error:', err);
-    }
-  }, [selectedInputId]);
-
-  useEffect(() => {
-    refreshDevices();
-    navigator.mediaDevices?.addEventListener?.('devicechange', refreshDevices);
-    return () => {
-      navigator.mediaDevices?.removeEventListener?.('devicechange', refreshDevices);
-    };
-  }, [refreshDevices]);
-
-  // Active Profile object
-  const currentProfile = useMemo(
-    () => profiles.find((p) => p.id === currentProfileId) || profiles[0],
-    [profiles, currentProfileId]
+  return (
+    <StudioProvider>
+      <Shell />
+    </StudioProvider>
   );
+}
 
-  // Compute live synthesized DSP parameters from profile + sliders + noise + mic correction
-  const effectiveParams = useMemo<DSPParameters>(() => {
-    const p = currentProfile.params || BASE_DSP_PARAMS;
-    const nz = NOISE_MAP[noise] || NOISE_MAP.balanced;
-    const mic = MIC_CORRECTION_MODELS.find((m) => m.id === selectedMicModel) || MIC_CORRECTION_MODELS[0];
+function Shell() {
+  const s = useStudio();
+  useTheme(s.prefs.theme);
+  useCommandBridge();
+  useShortcutBridge();
+  useTrayPublisher();
+  useElectronPrefsSync();
 
-    const targetPreGain = isEnhancementOn ? boost * 0.38 : 0;
-    const warmthShift = (warmth - 50) * 0.12 + (mic.eqOffsets.warmthGain || 0);
-    const presenceShift = (presence - 50) * 0.12 + (mic.eqOffsets.presenceGain || 0);
-    const mudShift = mic.eqOffsets.mudGain || 0;
-    const airShift = mic.eqOffsets.airGain || 0;
-    const hpfFreq = mic.eqOffsets.hpfFreq || p.eq.hpfFreq;
+  if (!s.ready) return <div style={{ flexGrow: 1, background: 'var(--bg-canvas)' }} />;
 
-    return {
-      preGainDb: targetPreGain,
-      noiseGate: {
-        enabled: isEnhancementOn && noise !== 'off',
-        thresholdDb: nz.thresholdDb,
-        reductionDb: nz.reductionDb,
-        attackMs: 10,
-        releaseMs: 180,
-      },
-      eq: {
-        enabled: isEnhancementOn,
-        hpfFreq,
-        warmthFreq: p.eq.warmthFreq,
-        warmthGainDb: p.eq.warmthGainDb + warmthShift,
-        mudFreq: p.eq.mudFreq,
-        mudGainDb: p.eq.mudGainDb + mudShift,
-        mudQ: p.eq.mudQ,
-        presenceFreq: p.eq.presenceFreq,
-        presenceGainDb: p.eq.presenceGainDb + presenceShift,
-        presenceQ: p.eq.presenceQ,
-        airFreq: p.eq.airFreq,
-        airGainDb: p.eq.airGainDb + airShift,
-      },
-      compressor: {
-        enabled: isEnhancementOn,
-        thresholdDb: p.compressor.thresholdDb,
-        ratio: p.compressor.ratio,
-        attackMs: p.compressor.attackMs,
-        releaseMs: p.compressor.releaseMs,
-        kneeDb: p.compressor.kneeDb,
-      },
-      deEsser: {
-        enabled: isEnhancementOn,
-        freq: p.deEsser.freq,
-        reductionDb: p.deEsser.reductionDb,
-      },
-      limiter: {
-        enabled: isEnhancementOn,
-        ceilingDb: -1.0,
-      },
-      outputGainDb: isEnhancementOn ? p.outputGainDb : 0,
-    };
-  }, [currentProfile, isEnhancementOn, boost, warmth, presence, noise, selectedMicModel]);
-
-  // Connect DSP Meter Callback
-  useEffect(() => {
-    dspEngine.setMeterCallback((data: MeterData) => {
-      setMeterData(data);
-    });
-  }, []);
-
-  // Sync DSP Engine when parameters or devices change
-  useEffect(() => {
-    dspEngine.updateParameters(effectiveParams);
-  }, [effectiveParams]);
-
-  useEffect(() => {
-    dspEngine.setMonitoring(isMonitoring, monitorVolume);
-  }, [isMonitoring, monitorVolume]);
-
-  // Start DSP on initial mount
-  useEffect(() => {
-    let started = false;
-    const initAudio = async () => {
-      try {
-        await dspEngine.start(
-          selectedInputId,
-          selectedOutputId,
-          selectedMonitorId,
-          effectiveParams,
-          isMonitoring,
-          monitorVolume
-        );
-        started = true;
-      } catch (err) {
-        console.warn('Autoplay/Device permission required to start Web Audio:', err);
-      }
-    };
-
-    initAudio();
-    return () => {
-      if (started) dspEngine.stop();
-    };
-  }, [selectedInputId, selectedOutputId, selectedMonitorId]);
-
-  // Keyboard Shortcuts (matching Windows design specs)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.altKey && e.code === 'KeyM') {
-        e.preventDefault();
-        setIsEnhancementOn((v) => !v);
-      }
-      if (e.ctrlKey && e.altKey && e.code === 'KeyB') {
-        e.preventDefault();
-        setIsEnhancementOn((v) => !v);
-      }
-      if (e.ctrlKey && e.altKey && e.code === 'KeyP') {
-        e.preventDefault();
-        setProfiles((currList) => {
-          const idx = currList.findIndex((p) => p.id === currentProfileId);
-          const nextIdx = (idx + 1) % currList.length;
-          setCurrentProfileId(currList[nextIdx].id);
-          return currList;
-        });
-      }
-      if (e.key === 'Escape') {
-        setIsTestSoundOpen(false);
-        setIsSaveProfileOpen(false);
-        setIsVoiceCheckOpen(false);
-        setDeleteProfileId(null);
-        setIsTrayQuickPanelOpen(false);
-        setIsNotificationsOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentProfileId]);
-
-  // User selects a profile
-  const handleSelectProfile = (profile: AurelProfile) => {
-    setCurrentProfileId(profile.id);
-  };
-
-  const handleCycleNoise = () => {
-    const modes: NoiseCleanupMode[] = ['off', 'light', 'balanced', 'strong'];
-    const nextIdx = (modes.indexOf(noise) + 1) % modes.length;
-    setNoise(modes[nextIdx]);
-  };
-
-  // Save new profile to SQLite
-  const handleSaveProfile = async (name: string, desc: string, tags: string) => {
-    const newProfile: AurelProfile = {
-      id: `custom-${Date.now()}`,
-      name,
-      desc,
-      tags,
-      curve: 'M0 30 C30 28 60 22 120 22 S200 20 260 22',
-      isBuiltIn: false,
-      params: effectiveParams,
-    };
-
-    const nextList = [...profiles, newProfile];
-    setProfiles(nextList);
-    setCurrentProfileId(newProfile.id);
-
-    if ((window as any).studioAPI?.savePreset) {
-      try {
-        await (window as any).studioAPI.savePreset(newProfile);
-      } catch (e) {
-        console.error('Failed to save preset to SQLite:', e);
-      }
-    }
-  };
-
-  // Delete profile from SQLite
-  const handleDeleteProfile = async (id: string) => {
-    setProfiles((prev) => prev.filter((p) => p.id !== id));
-    if (currentProfileId === id) {
-      setCurrentProfileId('broadcast');
-    }
-    if ((window as any).studioAPI?.deletePreset) {
-      try {
-        await (window as any).studioAPI.deletePreset(id);
-      } catch (e) {
-        console.error('Failed to delete preset from SQLite:', e);
-      }
-    }
-  };
-
-  const selectedInputLabel = useMemo(() => {
-    const found = inputDevices.find((d) => d.deviceId === selectedInputId);
-    return found ? found.label : 'USB Microphone';
-  }, [inputDevices, selectedInputId]);
-
-  const profileToDelete = useMemo(
-    () => profiles.find((p) => p.id === deleteProfileId),
-    [profiles, deleteProfileId]
-  );
+  if (s.modals.setup) {
+    return (
+      <>
+        <TitleBar title="Aurel Voice Studio — Setup" />
+        <VoiceCheckWizard />
+      </>
+    );
+  }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', width: '100vw', background: 'var(--bg-canvas)', overflow: 'hidden' }}>
-      {/* 40px Draggable Window Titlebar */}
+    <>
       <TitleBar />
-
-      {/* Main App Workspace */}
       <div style={{ flexGrow: 1, display: 'flex', minHeight: 0 }}>
-        {/* Left Navigation Sidebar */}
-        <Sidebar
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          inputDeviceLabel={selectedInputLabel}
-          isMicConnected={inputDevices.length > 0}
-          onOpenVoiceCheck={() => setIsVoiceCheckOpen(true)}
-        />
-
-        {/* Dynamic View Body */}
+        <Sidebar />
         <main style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minWidth: 0, position: 'relative' }}>
-          <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflowY: 'auto' }}>
-            {activeTab === 'studio' && (
-              <StudioView
-                currentProfileId={currentProfileId}
-                onSelectProfile={handleSelectProfile}
-                isEnhancementOn={isEnhancementOn}
-                onToggleEnhancement={() => setIsEnhancementOn((v) => !v)}
-                headphoneView={headphoneView}
-                onSelectHeadphoneView={setHeadphoneView}
-                isMonitoring={isMonitoring}
-                onToggleMonitoring={() => setIsMonitoring((v) => !v)}
-                boost={boost}
-                onBoostChange={setBoost}
-                warmth={warmth}
-                onWarmthChange={setWarmth}
-                presence={presence}
-                onPresenceChange={setPresence}
-                noise={noise}
-                onNoiseChange={setNoise}
-                onOpenTestSound={() => setIsTestSoundOpen(true)}
-                onOpenFineTune={() => setActiveTab('finetune')}
-                meterData={meterData}
-                inputDeviceLabel={selectedInputLabel}
-              />
-            )}
-
-            {activeTab === 'profiles' && (
-              <ProfilesView
-                currentProfileId={currentProfileId}
-                onSelectProfile={handleSelectProfile}
-                onOpenSaveModal={() => setIsSaveProfileOpen(true)}
-                onOpenFineTune={() => setActiveTab('finetune')}
-                onOpenDeleteModal={(id) => setDeleteProfileId(id)}
-              />
-            )}
-
-            {activeTab === 'finetune' && (
-              <FineTuneView
-                params={effectiveParams}
-                onUpdateParams={(p) => setCustomParams(p)}
-                selectedMicModel={selectedMicModel}
-                onSelectMicModel={setSelectedMicModel}
-                onOpenVoiceCheck={() => setIsVoiceCheckOpen(true)}
-                onOpenSaveModal={() => setIsSaveProfileOpen(true)}
-              />
-            )}
-
-            {activeTab === 'connect' && <ConnectAppsView />}
-
-            {activeTab === 'settings' && (
-              <SettingsView
-                inputDevices={inputDevices}
-                outputDevices={outputDevices}
-                selectedInputId={selectedInputId}
-                selectedOutputId={selectedOutputId}
-                onSelectInputId={setSelectedInputId}
-                onSelectOutputId={setSelectedOutputId}
-                theme={theme}
-                onThemeChange={setTheme}
-              />
+          <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            {s.status.state === 'error' ? (
+              <EngineProblem />
+            ) : (
+              <>
+                {s.tab === 'studio' && <StudioView />}
+                {s.tab === 'profiles' && <ProfilesView />}
+                {s.tab === 'finetune' && <FineTuneView />}
+                {s.tab === 'connect' && <ConnectAppsView />}
+                {s.tab === 'settings' && <SettingsView />}
+              </>
             )}
           </div>
-
-          {/* Global 30px Fixed Footer matching Design.html */}
-          <footer
-            style={{
-              height: '30px',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0 40px',
-              borderTop: '1px solid var(--border-titlebar)',
-              background: 'var(--bg-footer)',
-              fontSize: '12px',
-              color: 'var(--text-tertiary)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)' }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--color-success)' }} />
-                Audio engine running
-              </span>
-              <span className="mono font-mono">48 kHz · 24-bit · buffer {bufferSize || 256} · total delay 9.4 ms</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-              <span className="mono font-mono">CPU 2.1%</span>
-              <span>No internet needed</span>
-              <span className="mono font-mono">v1.0</span>
-            </div>
-          </footer>
+          <Footer />
         </main>
       </div>
-
-      {/* Modals & Overlays */}
-      <TestSoundModal
-        isOpen={isTestSoundOpen}
-        onClose={() => setIsTestSoundOpen(false)}
-        isEnhancementOn={isEnhancementOn}
-      />
-
-      <SaveProfileModal
-        isOpen={isSaveProfileOpen}
-        onClose={() => setIsSaveProfileOpen(false)}
-        onSave={handleSaveProfile}
-      />
-
-      <DeleteProfileModal
-        isOpen={!!deleteProfileId}
-        profileName={profileToDelete?.name || 'Custom Profile'}
-        onClose={() => setDeleteProfileId(null)}
-        onConfirm={() => {
-          if (deleteProfileId) handleDeleteProfile(deleteProfileId);
-        }}
-      />
-
-      <VoiceCheckWizard
-        isOpen={isVoiceCheckOpen}
-        onClose={() => setIsVoiceCheckOpen(false)}
-        inputDevices={inputDevices}
-        selectedInputId={selectedInputId}
-        onSelectInputId={setSelectedInputId}
-        onApplyProfile={(pid) => setCurrentProfileId(pid)}
-      />
-
-      <TrayQuickPanelModal
-        isOpen={isTrayQuickPanelOpen}
-        onClose={() => setIsTrayQuickPanelOpen(false)}
-        isEnhancementOn={isEnhancementOn}
-        onToggleEnhancement={() => setIsEnhancementOn((v) => !v)}
-        currentProfile={currentProfile}
-        onOpenProfiles={() => {
-          setActiveTab('profiles');
-          setIsTrayQuickPanelOpen(false);
-        }}
-        boost={boost}
-        onBoostChange={setBoost}
-        isMonitoring={isMonitoring}
-        onToggleMonitoring={() => setIsMonitoring((v) => !v)}
-        noise={noise}
-        onCycleNoise={handleCycleNoise}
-        onOpenApp={() => setIsTrayQuickPanelOpen(false)}
-        onOpenSettings={() => {
-          setActiveTab('settings');
-          setIsTrayQuickPanelOpen(false);
-        }}
-      />
-
-      <NotificationsDrawer
-        isOpen={isNotificationsOpen}
-        onClose={() => setIsNotificationsOpen(false)}
-        onOpenApp={() => setIsNotificationsOpen(false)}
-      />
-    </div>
+      {s.modals.testSound && <TestSoundModal />}
+      {s.modals.saveProfile && <SaveProfileModal />}
+      {s.modals.deleteProfileId && <DeleteProfileModal />}
+      {!s.prefs.tourDone && s.tab === 'studio' && s.status.state !== 'error' && <FirstRunTour />}
+      <InPageNotifications />
+    </>
   );
+}
+
+function Footer() {
+  const s = useStudio();
+  const cpu = useCpu();
+  const [version, setVersion] = useState('1.0');
+  useEffect(() => {
+    window.studioAPI?.getVersions().then((v) => setVersion(v.app.replace(/\.0$/, '')));
+  }, []);
+  const st = s.status;
+  const lost = st.inputLost || s.inputMissing;
+  const dot = st.state === 'running' && !lost ? 'var(--success)' : st.state === 'error' || lost ? 'var(--live)' : 'var(--text-tertiary)';
+  const label =
+    lost ? 'Audio engine paused · waiting for input'
+    : st.state === 'running' ? 'Audio engine running'
+    : st.state === 'starting' ? 'Starting audio engine…'
+    : st.state === 'error' ? 'Audio engine stopped'
+    : 'Audio engine off';
+  return (
+    <footer className="row xsmall faint" style={{ height: 30, flexShrink: 0, justifyContent: 'space-between', padding: '0 40px', borderTop: '1px solid var(--border-titlebar)', background: 'var(--bg-footer)' }}>
+      <div className="row" style={{ gap: 20 }}>
+        <span className="row muted" style={{ gap: 6 }}>
+          <span className="dot" style={{ width: 7, height: 7, background: dot }} />
+          {label}
+        </span>
+        {st.state === 'running' && !lost && (
+          <span className="mono">
+            {Number((st.sampleRate / 1000).toFixed(1))} kHz · buffer {s.prefs.bufferSize} · total delay {st.latencyMs.toFixed(1)} ms
+          </span>
+        )}
+      </div>
+      <div className="row" style={{ gap: 20 }}>
+        {cpu !== null && <span className="mono">CPU {cpu.toFixed(1)}%</span>}
+        <span>No internet needed</span>
+        <span className="mono">v{version}</span>
+      </div>
+    </footer>
+  );
+}
+
+// Commands from the tray panel and notification pop-ups.
+export function runCommand(s: Studio, cmd: Command) {
+  switch (cmd.type) {
+    case 'setLive':
+      s.setLive(cmd.patch);
+      break;
+    case 'selectProfile':
+      s.selectProfile(cmd.id);
+      break;
+    case 'useInput':
+      s.setPrefs({ inputId: cmd.id });
+      break;
+    case 'showMain':
+      if (cmd.tab) s.setTab(cmd.tab as Tab);
+      window.studioAPI?.showMainWindow();
+      break;
+    case 'setMonitor':
+      s.setMonitorOn(cmd.on);
+      break;
+    case 'cycleNoise': {
+      const order: NoiseMode[] = ['off', 'light', 'balanced', 'strong'];
+      s.updateWorking((w) => {
+        const cur = w.noise.enabled ? w.noise.mode : 'off';
+        setNoiseMode(w, order[(order.indexOf(cur) + 1) % order.length]);
+      });
+      break;
+    }
+    case 'nextProfile': {
+      const i = s.profiles.findIndex((p) => p.id === s.active.id);
+      s.selectProfile(s.profiles[(i + 1) % s.profiles.length].id);
+      break;
+    }
+  }
+}
+
+function useCommandBridge() {
+  const s = useStudio();
+  const ref = useRef(s);
+  ref.current = s;
+  useEffect(() => {
+    if (!window.studioAPI) return;
+    return window.studioAPI.onCommand((cmd) => runCommand(ref.current, cmd as Command));
+  }, []);
+}
+
+// Global shortcuts (Settings › Keyboard shortcuts), plus Ctrl+Alt+<digit> per profile.
+function useShortcutBridge() {
+  const s = useStudio();
+  const ref = useRef(s);
+  ref.current = s;
+  const { shortcuts } = s.prefs;
+  const profileKeys = s.profiles.filter((p) => p.shortcut).map((p) => p.shortcut).join(',');
+  const monitorBefore = useRef(false);
+
+  // Push-to-talk: while a key is set, the mic stays muted except while it's held.
+  useEffect(() => {
+    if (!s.ready) return;
+    s.setLive({ muted: !!shortcuts.pushToTalk });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shortcuts.pushToTalk, s.ready]);
+
+  useEffect(() => {
+    if (!s.ready) return;
+    const map: Record<string, string | null> = { ...shortcuts };
+    for (const d of profileKeys.split(',').filter(Boolean)) map[`profile${d}`] = `Ctrl+Alt+${d}`;
+    const handle = (action: string, phase: 'down' | 'up') => {
+      const st = ref.current;
+      if (action === 'mute' && phase === 'down') st.setLive({ muted: !st.live.muted });
+      else if (action === 'hearOriginal') {
+        // Hold to hear your raw mic in your headphones; apps keep getting the enhanced voice.
+        if (phase === 'down') {
+          monitorBefore.current = st.monitorOn;
+          st.setLive({ hearOriginal: true });
+          st.setMonitorOn(true);
+        } else {
+          st.setLive({ hearOriginal: false });
+          st.setMonitorOn(monitorBefore.current);
+        }
+      }
+      else if (action === 'pushToTalk') st.setLive({ muted: phase === 'up' });
+      else if (action === 'nextProfile' && phase === 'down') runCommand(st, { type: 'nextProfile' });
+      else if (action.startsWith('profile') && phase === 'down') {
+        const p = st.profiles.find((x) => x.shortcut === action.slice(7));
+        if (p) st.selectProfile(p.id);
+      }
+    };
+    if (window.studioAPI) {
+      window.studioAPI.setShortcuts(map);
+      return window.studioAPI.onShortcut(handle);
+    }
+    // Plain browser: shortcuts work while the page has focus. Key-up of any key in a held
+    // combination ends a hold.
+    const held = new Set<string>();
+    const match = (e: KeyboardEvent) => {
+      const key = e.key.length === 1 ? e.key.toUpperCase() : e.key;
+      const parts = [e.ctrlKey && 'Ctrl', e.altKey && 'Alt', e.shiftKey && 'Shift', key].filter(Boolean).join('+');
+      return Object.entries(map).find(([, acc]) => acc === parts)?.[0];
+    };
+    const down = (e: KeyboardEvent) => {
+      const a = match(e);
+      if (a && !e.repeat) {
+        e.preventDefault();
+        held.add(a);
+        handle(a, 'down');
+      }
+    };
+    const up = () => {
+      held.forEach((a) => handle(a, 'up'));
+      held.clear();
+    };
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup', up);
+    return () => {
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.ready, shortcuts.mute, shortcuts.hearOriginal, shortcuts.nextProfile, shortcuts.pushToTalk, profileKeys]);
+}
+
+export interface TrayState {
+  enhancementOn: boolean;
+  muted: boolean;
+  boostDb: number;
+  monitorOn: boolean;
+  hearOriginal: boolean;
+  noiseLabel: string;
+  noiseOn: boolean;
+  profileId: string;
+  profiles: { id: string; name: string }[];
+  outLufs: number;
+  onTarget: 'on' | 'low' | 'high' | 'off';
+  statusText: string;
+  wave: number[];
+  muteKeys: string | null;
+  theme: 'light' | 'dark';
+}
+
+// Sends a small snapshot to the tray panel window a few times a second.
+function useTrayPublisher() {
+  const s = useStudio();
+  const m = useMeters(250);
+  useEffect(() => {
+    if (!window.studioAPI || !s.ready) return;
+    const lufs = m.out.shortTermLufs;
+    const onTarget = !s.live.enhancementOn ? 'off' : lufs > -18.5 && lufs < -13.5 ? 'on' : lufs <= -18.5 ? 'low' : 'high';
+    const noiseOn = s.working.noise.enabled && s.working.noise.mode !== 'off';
+    const state: TrayState = {
+      enhancementOn: s.live.enhancementOn,
+      muted: s.live.muted,
+      boostDb: s.live.boostDb,
+      monitorOn: s.monitorOn,
+      hearOriginal: s.live.hearOriginal,
+      noiseOn,
+      noiseLabel: NOISE_MODES[noiseOn ? s.working.noise.mode : 'off'].label,
+      profileId: s.active.id,
+      profiles: s.profiles.map((p) => ({ id: p.id, name: p.name })),
+      outLufs: lufs,
+      onTarget,
+      statusText:
+        s.status.state !== 'running' ? 'Audio engine stopped'
+        : s.status.inputLost ? 'Mic unplugged'
+        : s.live.muted ? 'Muted'
+        : s.live.enhancementOn ? 'Enhancing'
+        : 'Bypassed · raw mic',
+      wave: Array.from(engine.outHistory.slice(-49)),
+      muteKeys: s.prefs.shortcuts.mute,
+      theme: document.documentElement.classList.contains('theme-light') ? 'light' : 'dark',
+    };
+    window.studioAPI.publishState(state);
+  }, [s, m]);
+}
+
+// Main-process behaviour that follows Settings choices.
+function useElectronPrefsSync() {
+  const s = useStudio();
+  const { startWithWindows, startInTray, closeAction } = s.prefs;
+  useEffect(() => {
+    if (!window.studioAPI || !s.ready) return;
+    window.studioAPI.setLoginItem({ openAtLogin: startWithWindows, openInTray: startInTray });
+  }, [startWithWindows, startInTray, s.ready]);
+  useEffect(() => {
+    if (!window.studioAPI || !s.ready) return;
+    window.studioAPI.setCloseToTray(closeAction === 'tray');
+  }, [closeAction, s.ready]);
 }

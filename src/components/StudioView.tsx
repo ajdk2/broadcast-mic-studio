@@ -1,955 +1,406 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { AurelProfile, HeadphonePreviewMode, MeterData, NoiseCleanupMode } from '../types';
-import { AUREL_PROFILES, NOISE_MAP } from '../presets';
-import { AurelSlider } from './AurelSlider';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { engine } from '../audio/engine';
+import { useMeters, useStudio, shortLabel } from '../state/store';
+import { isCablePlayback } from '../routing';
+import { BOOST_MAX_DB, NOISE_MODES, NoiseMode, TONE_RANGE_DB, curvePath, effectiveBands, fmtDb, setNoiseMode, signed } from '../voice/model';
+import { Icon, LevelBar, Segmented, Slider, Switch } from '../ui/kit';
+import { Waveform } from './Waveform';
 
-interface StudioViewProps {
-  currentProfileId: string;
-  onSelectProfile: (profile: AurelProfile) => void;
-  isEnhancementOn: boolean;
-  onToggleEnhancement: () => void;
-  headphoneView: HeadphonePreviewMode;
-  onSelectHeadphoneView: (view: HeadphonePreviewMode) => void;
-  isMonitoring: boolean;
-  onToggleMonitoring: () => void;
-  boost: number;
-  onBoostChange: (v: number) => void;
-  warmth: number;
-  onWarmthChange: (v: number) => void;
-  presence: number;
-  onPresenceChange: (v: number) => void;
-  noise: NoiseCleanupMode;
-  onNoiseChange: (n: NoiseCleanupMode) => void;
-  onOpenTestSound: () => void;
-  onOpenFineTune?: () => void;
-  meterData: MeterData | null;
-  inputDeviceLabel: string;
-  isMicConnected?: boolean;
-  onSelectMicDevice?: () => void;
-}
+const TARGET_LOW = -18.5;
+const TARGET_HIGH = -13.5;
 
-export const StudioView: React.FC<StudioViewProps> = ({
-  currentProfileId,
-  onSelectProfile,
-  isEnhancementOn,
-  onToggleEnhancement,
-  headphoneView,
-  onSelectHeadphoneView,
-  isMonitoring,
-  onToggleMonitoring,
-  boost,
-  onBoostChange,
-  warmth,
-  onWarmthChange,
-  presence,
-  onPresenceChange,
-  noise,
-  onNoiseChange,
-  onOpenTestSound,
-  onOpenFineTune,
-  meterData,
-  inputDeviceLabel,
-  isMicConnected = true,
-  onSelectMicDevice,
-}) => {
-  const [autoLevel, setAutoLevel] = useState<boolean>(true);
-  const [showClippingToast, setShowClippingToast] = useState<boolean>(false);
+export function StudioView() {
+  const s = useStudio();
+  const m = useMeters(100);
+  const { live, working } = s;
 
-  const currentProfile = useMemo(
-    () => AUREL_PROFILES.find((p) => p.id === currentProfileId) || AUREL_PROFILES[0],
-    [currentProfileId]
-  );
+  // Loudness only means something while you talk, so hold the last spoken value.
+  const spoken = useRef({ lufs: NaN, rawLufs: NaN });
+  if (m.speaking && m.out.shortTermLufs > -70) spoken.current = { lufs: m.out.shortTermLufs, rawLufs: m.raw.shortTermLufs };
+  const outLufs = live.muted ? NaN : live.enhancementOn ? spoken.current.lufs : spoken.current.rawLufs;
+  const rawLufs = spoken.current.rawLufs;
+  const has = Number.isFinite(outLufs);
+  const inTarget = has && outLufs > TARGET_LOW && outLufs < TARGET_HIGH;
 
-  // Mathematical gain and loudness calculation matching Design.html
-  const gain = isEnhancementOn ? boost * 0.38 : 0;
-  const inLevel = -41.8;
-  const outLevel = inLevel + gain;
+  let statusText: string;
+  let statusColor: string;
+  if (live.muted) {
+    statusText = 'Muted. Your apps hear silence.';
+    statusColor = 'var(--error-text)';
+  } else if (!has) {
+    statusText = 'Say something to measure your level.';
+    statusColor = 'var(--text-tertiary)';
+  } else if (!live.enhancementOn) {
+    statusText = 'Raw mic level. Most listeners will struggle to hear you.';
+    statusColor = 'var(--error-text)';
+  } else if (inTarget) {
+    statusText = `On target for podcasts and broadcast (${signed(working.leveler.targetLufs, 0)})`;
+    statusColor = 'var(--success)';
+  } else if (outLufs <= TARGET_LOW) {
+    statusText = 'A little quiet. Raise Voice Boost.';
+    statusColor = 'var(--accent-text)';
+  } else {
+    statusText = 'Hot. Lower Voice Boost to avoid pumping.';
+    statusColor = 'var(--accent-text)';
+  }
 
-  const sgn = (v: number, d: number) => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(d);
-  const outLabel = sgn(outLevel, 1).replace('+', '');
+  const truePeak = useHeldMax(m.out.truePeakDb, 3000);
+  const noiseOn = working.noise.enabled && working.noise.mode !== 'off';
+  const floorOut = live.enhancementOn ? m.noiseOutDb + m.out.gainDb : m.raw.noiseFloorDb;
+  const lift = live.enhancementOn ? m.out.gainDb : 0;
 
-  const inTarget = isEnhancementOn && outLevel > -18.5 && outLevel < -13.5;
-  const statusColor = !isEnhancementOn ? '#FF8A7E' : inTarget ? '#43D18A' : '#FFC869';
-  const statusText = !isEnhancementOn
-    ? 'Raw mic level. Most listeners will struggle to hear you.'
-    : inTarget
-    ? 'On target for podcasts and broadcast (−16)'
-    : outLevel <= -18.5
-    ? 'A little quiet. Raise Voice Boost.'
-    : 'Hot. Lower Voice Boost to avoid pumping.';
-
-  const liftLabel = sgn(gain, 0) + ' dB';
-  const noiseMap = NOISE_MAP[noise] || NOISE_MAP.balanced;
-  const floorLabel = isEnhancementOn ? noiseMap.floor : NOISE_MAP.off.floor;
-
-  // Meter width helper (324px max width, range -60dB to 0dB)
-  const meter = (v: number) => Math.max(4, Math.min(324, ((60 + v) / 60) * 324));
-  const inW = meter(inLevel);
-  const outW = meter(outLevel);
-
-
-  const boostLabel = sgn(boost * 0.38, 0) + ' dB';
-  const warmthLabel = sgn((warmth - 50) * 0.12, 1) + ' dB';
-  const presenceLabel = sgn((presence - 50) * 0.12, 1) + ' dB';
-
-  // Check for clipping alert
-  useEffect(() => {
-    if (outLevel > -2.0 && isEnhancementOn) {
-      setShowClippingToast(true);
-    }
-  }, [outLevel, isEnhancementOn]);
-
-  // Animated live waveform curves matching Design.html formula
-  const [animTick, setAnimTick] = useState<number>(0);
-  useEffect(() => {
-    let animId: number;
-    const loop = () => {
-      setAnimTick((t) => (t + 1) % 100000);
-      animId = requestAnimationFrame(loop);
-    };
-    animId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(animId);
-  }, []);
-
-  const { inD, outD } = useMemo(() => {
-    const fr = (x: number) => x - Math.floor(x);
-    const g = boost / 68;
-    let inPath = '';
-    let outPath = '';
-    const numBars = 140;
-
-    for (let i = 0; i < numBars; i++) {
-      const x = 4 + i * 8;
-      const tShift = animTick * 0.02;
-      const r = fr(Math.sin(i * 12.9898 + tShift) * 43758.5453);
-      const syl = Math.abs(Math.sin(i * 0.31 - tShift * 0.4));
-      const phrase = Math.max(0, Math.sin(i * 0.058 + 0.5 - tShift * 0.1));
-      const e = syl * phrase;
-
-      const hin = 1.5 + 20 * e * (0.55 + 0.45 * r);
-      let hout = hin;
-      if (isEnhancementOn) {
-        hout = e > 0.07 ? Math.min(98, 6 + 88 * Math.pow(e * (0.75 + 0.25 * r), 0.5) * g) : 1.2;
-      }
-
-      inPath += `M${x} ${(110 - hin).toFixed(1)}V${(110 + hin).toFixed(1)}`;
-      outPath += `M${x} ${(110 - hout).toFixed(1)}V${(110 + hout).toFixed(1)}`;
-    }
-
-    return { inD: inPath, outD: outPath };
-  }, [animTick, boost, isEnhancementOn]);
-
-  const liveCaption = isEnhancementOn
-    ? `Listening through the ${currentProfile.name} profile`
-    : 'Enhancement bypassed';
+  const cards = useMemo(() => {
+    const builtIns = s.profiles.filter((p) => p.builtIn);
+    return s.active.builtIn ? builtIns : [s.active, ...builtIns.slice(0, 4)];
+  }, [s.profiles, s.active]);
 
   return (
-    <div
-      style={{
-        position: 'relative',
-        flexGrow: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px',
-        padding: '30px 40px 28px',
-        boxSizing: 'border-box',
-      }}
-    >
-      {/* Toast Alert: Voice too loud (clipping) - Design Board 13 */}
-      {showClippingToast && (
-        <div
-          role="alert"
-          style={{
-            position: 'absolute',
-            right: '408px',
-            top: '64px',
-            zIndex: 100,
-            width: '440px',
-            display: 'flex',
-            gap: '14px',
-            padding: '16px 18px',
-            boxSizing: 'border-box',
-            borderRadius: '12px',
-            background: '#2A1512',
-            border: '1px solid #6A2C25',
-            boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF8A7E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ flexShrink: 0, marginTop: '1px' }}>
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-            <line x1="12" y1="9" x2="12" y2="13" />
-            <line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-          <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: '#F3F2EF' }}>Voice too loud — clipping detected</span>
-            <span style={{ fontSize: '13px', lineHeight: 1.5, color: '#D8B8B5' }}>
-              Voice Boost is pushing your voice over 0 dB. Lower Voice Boost to keep your sound clean.
-            </span>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  onBoostChange(52);
-                  setShowClippingToast(false);
-                }}
-                style={{
-                  height: '30px',
-                  padding: '0 12px',
-                  borderRadius: '6px',
-                  background: '#FF8A7E',
-                  color: '#1B0E0D',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                }}
-              >
-                Lower to +20 dB
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowClippingToast(false)}
-                style={{
-                  height: '30px',
-                  padding: '0 10px',
-                  background: 'transparent',
-                  color: '#B9BBC1',
-                  fontSize: '12px',
-                }}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-        {/* Top Header (Height 60px) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px', flexShrink: 0, gap: '20px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0, flexShrink: 1 }}>
-            <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-              Studio
-            </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-tertiary)', minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{inputDeviceLabel || 'USB Microphone'}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" style={{ flexShrink: 0 }}>
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-              <span style={{ color: 'var(--text-secondary)', flexShrink: 0 }}>Aurel Microphone</span>
-              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>· used by Microsoft Teams, OBS Studio</span>
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-            <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>Headphone preview</span>
-            <div
-              role="group"
-              aria-label="Headphone preview"
-              style={{
-                display: 'flex',
-                gap: '2px',
-                padding: '3px',
-                background: '#15171A',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '10px',
-              }}
-            >
-              <button
-                type="button"
-                aria-pressed={headphoneView === 'original'}
-                onClick={() => onSelectHeadphoneView('original')}
-                style={{
-                  height: '34px',
-                  padding: '0 16px',
-                  border: 0,
-                  borderRadius: '7px',
-                  background: headphoneView === 'original' ? '#2B2E34' : 'transparent',
-                  color: headphoneView === 'original' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontSize: '13px',
-                  fontWeight: headphoneView === 'original' ? 600 : 500,
-                  transition: 'background 0.12s ease',
-                }}
-              >
-                Original
-              </button>
-              <button
-                type="button"
-                aria-pressed={headphoneView === 'enhanced'}
-                onClick={() => onSelectHeadphoneView('enhanced')}
-                style={{
-                  height: '34px',
-                  padding: '0 16px',
-                  border: 0,
-                  borderRadius: '7px',
-                  background: headphoneView === 'enhanced' ? '#2B2E34' : 'transparent',
-                  color: headphoneView === 'enhanced' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontSize: '13px',
-                  fontWeight: headphoneView === 'enhanced' ? 600 : 500,
-                  transition: 'background 0.12s ease',
-                }}
-              >
-                Enhanced
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={onOpenTestSound}
-              style={{
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 14px',
-                background: 'var(--bg-raised)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '10px',
-                boxSizing: 'border-box',
-                fontSize: '13px',
-                fontWeight: 500,
-                color: 'var(--text-primary)',
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-                <circle cx="12" cy="12" r="8" />
-                <circle cx="12" cy="12" r="3.5" fill="#FF6A5C" stroke="none" />
-              </svg>
-              Test my sound
-            </button>
-
-            <button
-              type="button"
-              className="ghost"
-              onClick={onToggleMonitoring}
-              aria-pressed={isMonitoring}
-              style={{
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '0 14px',
-                background: 'var(--bg-raised)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: 500,
-                color: 'var(--text-primary)',
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-                <path d="M4 15v-3a8 8 0 0 1 16 0v3" />
-                <rect x="3" y="14" width="4" height="6" rx="1.5" />
-                <rect x="17" y="14" width="4" height="6" rx="1.5" />
-              </svg>
-              {isMonitoring ? 'Monitoring' : 'Monitor off'}
-            </button>
-
-            <div style={{ width: '1px', height: '28px', background: 'var(--border-subtle)' }} />
-
-            {/* Master Switch Button */}
-            {isEnhancementOn ? (
-              <button
-                type="button"
-                role="switch"
-                aria-checked="true"
-                onClick={onToggleEnhancement}
-                style={{
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '0 8px 0 16px',
-                  background: 'var(--accent-amber-tint)',
-                  border: '1px solid var(--accent-amber-border)',
-                  borderRadius: '10px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: 'var(--accent-amber-text)',
-                }}
-              >
-                Enhancement on
-                <span
-                  style={{
-                    width: '40px',
-                    height: '24px',
-                    borderRadius: '12px',
-                    background: 'var(--accent-amber)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    padding: '3px',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#1B1204' }} />
-                </span>
-              </button>
+    <div className="page">
+      <div className="page-head">
+        <div className="col" style={{ gap: 6, minWidth: 0 }}>
+          <h1 className="h1">Studio</h1>
+          <div className="row small faint" style={{ gap: 8, minWidth: 0 }}>
+            <span className="ellipsis" style={{ maxWidth: 320 }}>{s.inputLabel}</span>
+            <Icon name="arrowRight" size={14} />
+            {isCablePlayback(s.outputLabel) ? (
+              <>
+                <span className="muted">VB-Audio Cable</span>
+                <span className="ellipsis">· apps pick CABLE Output</span>
+              </>
             ) : (
-              <button
-                type="button"
-                role="switch"
-                aria-checked="false"
-                onClick={onToggleEnhancement}
-                style={{
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  padding: '0 8px 0 16px',
-                  background: 'var(--bg-raised)',
-                  border: '1px solid var(--border-strong)',
-                  borderRadius: '10px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                Bypassed — raw mic
-                <span
-                  style={{
-                    width: '40px',
-                    height: '24px',
-                    borderRadius: '12px',
-                    background: '#666A73',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    padding: '3px',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: '#B9BBC1' }} />
-                </span>
-              </button>
+              <span className="ellipsis" style={{ color: 'var(--accent-text)' }}>
+                {s.outputLabel ? `${shortLabel(s.outputLabel)} · apps can’t hear you` : 'Not sent to your apps yet'}
+              </span>
             )}
           </div>
         </div>
-
-        {/* Section 1: Live Voice or Unplugged State (Height 348px) */}
-        {!isMicConnected ? (
-          <section
-            aria-label="Microphone unplugged"
+        <div className="row" style={{ gap: 12, flexShrink: 0 }}>
+          <span className="xsmall faint hide-narrow">Headphone preview</span>
+          <Segmented
+            label="Headphone preview"
+            value={live.hearOriginal ? 'original' : 'enhanced'}
+            options={[
+              { value: 'original', label: 'Original' },
+              { value: 'enhanced', label: 'Enhanced' },
+            ]}
+            onChange={(v) => {
+              s.setLive({ hearOriginal: v === 'original' });
+              if (!s.monitorOn) s.setMonitorOn(true);
+            }}
+          />
+          <button className="btn" onClick={() => s.openModal({ testSound: true })}>
+            <Icon name="record" size={14} style={{ color: 'var(--live)' }} />
+            Test my sound
+          </button>
+          <button className="btn" aria-pressed={s.monitorOn} onClick={() => s.setMonitorOn(!s.monitorOn)} style={s.monitorOn ? { borderColor: 'var(--accent-border)', color: 'var(--accent-text)' } : undefined}>
+            <Icon name="headphones" size={16} />
+            {s.monitorOn ? 'Monitoring' : 'Monitor off'}
+          </button>
+          <div style={{ width: 1, height: 28, background: 'var(--border-control)' }} />
+          <button
+            type="button"
+            role="switch"
+            aria-checked={live.enhancementOn}
+            onClick={() => s.setLive({ enhancementOn: !live.enhancementOn })}
+            className="btn"
             style={{
-              height: '348px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-              padding: '32px',
+              gap: 12,
+              padding: '0 8px 0 16px',
+              fontWeight: 600,
+              background: live.enhancementOn ? 'var(--accent-tint)' : 'var(--bg-surface-2)',
+              borderColor: live.enhancementOn ? 'var(--accent-border)' : 'var(--border-strong)',
+              color: live.enhancementOn ? 'var(--accent-text)' : 'var(--text-secondary)',
             }}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', textAlign: 'center', maxWidth: '480px' }}>
-              <div
-                style={{
-                  width: '88px',
-                  height: '88px',
-                  borderRadius: '50%',
-                  background: '#2A1512',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FF8A7E" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-                  <rect x="9" y="3" width="6" height="11" rx="3" />
-                  <path d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7" />
-                  <path d="M3 3l18 18" />
+            {live.enhancementOn ? 'Enhancement on' : 'Bypassed — raw mic'}
+            <span className="switch sm" aria-checked={live.enhancementOn} style={{ width: 40, height: 24 }}>
+              <span style={{ width: 18, height: 18 }} />
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <UnpluggedBanner />
+      <ClippingBanner />
+
+      <section aria-label="Live voice" className="card row" style={{ height: 'clamp(300px, calc(100vh - 732px), 480px)', flexShrink: 0, overflow: 'hidden', alignItems: 'stretch' }} data-tour="live">
+        <div className="col grow" style={{ gap: 16, padding: '26px 28px' }}>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <div className="row" style={{ gap: 10 }}>
+              <span className="dot" style={{ background: m.speaking && !live.muted ? 'var(--live)' : 'var(--text-disabled)' }} />
+              <h2 className="h3">Live voice</h2>
+              <span className="small faint hide-narrow ellipsis">
+                {live.muted ? 'Muted' : live.enhancementOn ? `Listening through the ${s.active.name} profile` : 'Enhancement bypassed'}
+              </span>
+            </div>
+            <div className="row xsmall muted" style={{ gap: 18, whiteSpace: 'nowrap' }}>
+              <span className="row" style={{ gap: 8 }}><span style={{ width: 14, height: 4, borderRadius: 2, background: 'var(--meter-raw)' }} />Your raw mic</span>
+              <span className="row" style={{ gap: 8 }}><span style={{ width: 14, height: 4, borderRadius: 2, background: 'var(--accent)' }} />{live.enhancementOn ? 'Enhanced by Aurel' : 'Sent to apps'}</span>
+            </div>
+          </div>
+          <Waveform fill emphasis={live.hearOriginal ? 'raw' : 'out'} />
+          <div className="mono row" style={{ justifyContent: 'space-between', fontSize: 11, color: 'var(--text-tertiary)' }}>
+            <span>−12 s</span><span>−9 s</span><span>−6 s</span><span>−3 s</span><span>Now</span>
+          </div>
+        </div>
+        <div className="col" style={{ width: 380, flexShrink: 0, borderLeft: '1px solid var(--border-subtle)', background: 'var(--bg-inset)', gap: 22, padding: '26px 28px' }} data-tour="loudness">
+          <div className="col" style={{ gap: 6 }}>
+            <span className="small faint">Output loudness</span>
+            <div className="row" style={{ alignItems: 'baseline', gap: 8 }}>
+              <span className="mono" style={{ fontSize: 52, fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1 }}>{has ? signed(outLufs, 1).replace('+', '') : '—'}</span>
+              <span className="muted" style={{ fontSize: 15 }}>LUFS</span>
+            </div>
+            <span className="small" style={{ color: statusColor }} role="status">{statusText}</span>
+          </div>
+          <div className="col" style={{ gap: 14 }}>
+            <div className="col" style={{ gap: 7 }}>
+              <div className="row xsmall muted" style={{ justifyContent: 'space-between' }}><span>Raw mic</span><span className="mono">{Number.isFinite(rawLufs) ? signed(rawLufs, 1).replace('+', '') : '—'}</span></div>
+              <LevelBar db={m.raw.momentaryLufs} color="var(--meter-raw)" />
+            </div>
+            <div className="col" style={{ gap: 7 }}>
+              <div className="row xsmall" style={{ justifyContent: 'space-between' }}><span className="muted">{live.enhancementOn ? 'Enhanced' : 'Sent to apps'}</span><span className="mono">{has ? signed(outLufs, 1).replace('+', '') : '—'}</span></div>
+              <TargetBar db={live.muted ? -120 : live.enhancementOn ? m.out.momentaryLufs : m.raw.momentaryLufs} />
+              <div className="mono row" style={{ justifyContent: 'space-between', fontSize: 10, color: 'var(--text-tertiary)' }}><span>−60</span><span>−40</span><span>−20</span><span>0</span></div>
+            </div>
+          </div>
+          <div style={{ marginTop: 'auto', display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 12, paddingTop: 18, borderTop: '1px solid var(--border-subtle)' }}>
+            <Stat label="Voice lift" value={fmtDb(lift, 0)} />
+            <Stat label="Noise floor" value={floorOut > -130 ? `${signed(floorOut, 0)} dB` : '—'} />
+            <Stat label="True peak" value={truePeak > -100 ? `${signed(truePeak, 1)} dB` : '—'} warn={truePeak > working.limiter.ceilingDb + 0.2} />
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="profiles-h" className="col" style={{ gap: 14 }} data-tour="profiles">
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <div className="row" style={{ alignItems: 'baseline', gap: 12 }}>
+            <h2 id="profiles-h" className="h2">Sound profile</h2>
+            <span className="small faint">Pick the character you want. Every profile keeps your Voice Boost.</span>
+          </div>
+          <button className="row small" style={{ gap: 6, fontWeight: 500, color: 'var(--accent-text)' }} onClick={() => s.setTab('finetune')}>
+            Customize current profile <Icon name="chevronRight" size={14} />
+          </button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cards.length}, minmax(0, 1fr))`, gap: 16 }}>
+          {cards.map((p) => {
+            const selected = p.id === s.active.id;
+            const bands = selected ? effectiveBands(working) : effectiveBands(p.settings);
+            return (
+              <button key={p.id} className="pick col" aria-pressed={selected} onClick={() => s.selectProfile(p.id)} style={{ height: 172, gap: 12, padding: '18px 20px' }}>
+                {selected && (
+                  <span className="row" style={{ position: 'absolute', right: 14, top: 14, width: 22, height: 22, borderRadius: '50%', background: 'var(--accent)', justifyContent: 'center', color: 'var(--accent-ink)' }}>
+                    <Icon name="check" size={12} strokeWidth={3} />
+                  </span>
+                )}
+                <svg width="100%" height="40" viewBox="0 0 260 40" preserveAspectRatio="none" aria-hidden="true">
+                  <path d={curvePath(bands, 260, 40)} fill="none" stroke={selected ? 'var(--accent)' : 'var(--meter-raw)'} strokeWidth="2" vectorEffect="non-scaling-stroke" />
                 </svg>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Mic unplugged · Teams is listening
-                </h2>
-                <span style={{ fontSize: '14px', lineHeight: 1.55, color: 'var(--text-secondary)' }}>
-                  Your audience is currently hearing silence. Plug your mic back in or choose another available microphone.
+                <span className="row" style={{ gap: 8, fontSize: 16, fontWeight: 600 }}>
+                  {p.name}
+                  {selected && s.edited && <span className="badge">Edited</span>}
                 </span>
-              </div>
-              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-                <button
-                  type="button"
-                  onClick={onSelectMicDevice}
-                  style={{
-                    height: '40px',
-                    padding: '0 18px',
-                    borderRadius: '10px',
-                    background: 'var(--accent-amber)',
-                    color: '#1B1204',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                  }}
-                >
-                  Choose another microphone
-                </button>
-              </div>
-            </div>
-          </section>
-        ) : (
-          <section
-            aria-label="Live voice"
-            style={{
-              height: '348px',
-              display: 'flex',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              flexShrink: 0,
-            }}
-          >
-            {/* Left Waveform graph */}
-            <div style={{ flexGrow: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '16px', padding: '26px 28px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FF6A5C' }} />
-                  <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Live voice</h2>
-                  <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>{liveCaption}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '18px', fontSize: '12px', color: 'var(--text-secondary)' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '14px', height: '4px', borderRadius: '2px', background: 'var(--meter-raw)' }} />
-                    Your raw mic
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ width: '14px', height: '4px', borderRadius: '2px', background: 'var(--meter-enhanced)' }} />
-                    Enhanced by Aurel
-                  </span>
-                </div>
-              </div>
-
-              <svg width="100%" height="220" viewBox="0 0 1120 220" preserveAspectRatio="none" role="img" aria-label="Live waveform comparing raw and enhanced voice">
-                <line x1="0" y1="10" x2="1120" y2="10" stroke="#202328" strokeDasharray="2 6" />
-                <line x1="0" y1="210" x2="1120" y2="210" stroke="#202328" strokeDasharray="2 6" />
-                <line x1="0" y1="110" x2="1120" y2="110" stroke="#2A2D33" />
-                <path d={outD} stroke="var(--accent-amber)" strokeWidth="4.5" strokeLinecap="round" fill="none" opacity={headphoneView === 'enhanced' ? 1 : 0.14} />
-                <path d={inD} stroke={headphoneView === 'enhanced' ? 'var(--meter-raw)' : 'var(--text-primary)'} strokeWidth="4.5" strokeLinecap="round" fill="none" />
-              </svg>
-
-              <div className="mono" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-tertiary)' }}>
-                <span>−12 s</span>
-                <span>−9 s</span>
-                <span>−6 s</span>
-                <span>−3 s</span>
-                <span>Now</span>
-              </div>
-            </div>
-
-            {/* Right Output Loudness panel */}
-            <div
-              style={{
-                width: '380px',
-                flexShrink: 0,
-                borderLeft: '1px solid var(--border-subtle)',
-                background: '#141619',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '22px',
-                padding: '26px 28px',
-                boxSizing: 'border-box',
-              }}
-            >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>Output loudness</span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span className="mono" style={{ fontSize: '52px', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, color: 'var(--text-primary)' }}>
-                    {outLabel}
-                  </span>
-                  <span style={{ fontSize: '15px', color: 'var(--text-secondary)' }}>LUFS</span>
-                </div>
-                <span style={{ fontSize: '13px', color: statusColor }}>{statusText}</span>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Raw mic</span>
-                    <span className="mono" style={{ color: 'var(--text-secondary)' }}>−41.8</span>
-                  </div>
-                  <svg width="324" height="8" viewBox="0 0 324 8" aria-hidden="true">
-                    <rect width="324" height="8" rx="4" fill="var(--meter-bg)" />
-                    <rect width={inW} height="8" rx="4" fill="var(--meter-raw)" />
-                  </svg>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Enhanced</span>
-                    <span className="mono" style={{ color: 'var(--text-primary)' }}>{outLabel}</span>
-                  </div>
-                  <svg width="324" height="8" viewBox="0 0 324 8" aria-hidden="true">
-                    <rect width="324" height="8" rx="4" fill="var(--meter-bg)" />
-                    <rect width={outW} height="8" rx="4" fill="var(--accent-amber)" />
-                    <rect x="237" y="0" width="2" height="8" fill="#F3F2EF" />
-                  </svg>
-                  <div className="mono" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--text-tertiary)' }}>
-                    <span>−60</span>
-                    <span>−40</span>
-                    <span>−20</span>
-                    <span>0</span>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  marginTop: 'auto',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                  gap: '12px',
-                  paddingTop: '18px',
-                  borderTop: '1px solid var(--border-subtle)',
-                }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>Voice lift</span>
-                  <span className="mono" style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{liftLabel}</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>Noise floor</span>
-                  <span className="mono" style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{floorLabel}</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>True peak</span>
-                  <span className="mono" style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>−1.0 dB</span>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Section 2: Sound Profile (5 columns) */}
-        <section aria-labelledby="profiles-h" style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-              <h2 id="profiles-h" style={{ margin: 0, fontSize: '17px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                Sound profile
-              </h2>
-              <span style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>
-                Pick the character you want. Every profile keeps your Voice Boost.
-              </span>
-            </div>
-            {onOpenFineTune && (
-              <button
-                type="button"
-                onClick={onOpenFineTune}
-                style={{
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  color: 'var(--accent-amber)',
-                  background: 'none',
-                }}
-              >
-                Customize current profile
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
+                <span className="small muted" style={{ lineHeight: 1.45 }}>{p.description}</span>
+                <span className="xsmall faint" style={{ marginTop: 'auto' }}>{p.tags}</span>
               </button>
-            )}
+            );
+          })}
+        </div>
+      </section>
+
+      <section aria-label="Essential controls" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 24, minHeight: 0 }}>
+        <div className="card col" style={{ gap: 16, padding: '22px 24px' }} data-tour="boost">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <div className="row" style={{ gap: 10 }}>
+              <h2 className="h3">Voice Boost</h2>
+              <span className="badge">For soft speakers</span>
+            </div>
+            <span className="mono" style={{ fontSize: 22, fontWeight: 500 }}>{fmtDb(live.boostDb, 0)}</span>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '16px' }}>
-            {AUREL_PROFILES.map((p) => {
-              const isSelected = p.id === currentProfileId;
-              return (
-                <button
-                  key={p.id}
-                  className="card-btn"
-                  onClick={() => onSelectProfile(p)}
-                  aria-pressed={isSelected}
-                  style={{
-                    position: 'relative',
-                    height: '172px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    padding: '18px 20px',
-                    boxSizing: 'border-box',
-                    textAlign: 'left',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: '14px',
-                    transition: 'border-color 0.15s ease',
-                  }}
-                >
-                  {isSelected && (
-                    <>
-                      <span
-                        style={{
-                          position: 'absolute',
-                          left: '-1px',
-                          top: '-1px',
-                          right: '-1px',
-                          bottom: '-1px',
-                          border: '2px solid var(--accent-amber)',
-                          borderRadius: '14px',
-                          pointerEvents: 'none',
-                        }}
-                      />
-                      <span
-                        style={{
-                          position: 'absolute',
-                          right: '14px',
-                          top: '14px',
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '50%',
-                          background: 'var(--accent-amber)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1B1204" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                          <path d="m5 12 5 5 9-10" />
-                        </svg>
-                      </span>
-                    </>
-                  )}
-
-                  <svg width="200" height="38" viewBox="0 0 260 40" preserveAspectRatio="none" aria-hidden="true">
-                    <line x1="0" y1="24" x2="260" y2="24" stroke="#2A2D33" strokeDasharray="3 4" />
-                    <path d={p.curve} fill="none" stroke={isSelected ? 'var(--accent-amber)' : 'var(--text-tertiary)'} strokeWidth="2.5" strokeLinecap="round" />
-                  </svg>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>{p.name}</span>
-                  <span style={{ fontSize: '13px', lineHeight: 1.45, color: 'var(--text-secondary)' }}>{p.desc}</span>
-                  <span style={{ marginTop: 'auto', fontSize: '12px', color: 'var(--text-tertiary)' }}>{p.tags}</span>
-                </button>
-              );
-            })}
+          <Slider label="Voice Boost amount" value={live.boostDb} min={0} max={BOOST_MAX_DB} step={1} valueText={fmtDb(live.boostDb, 0)} onChange={(v) => s.setLive({ boostDb: v })} />
+          <div className="row xsmall faint" style={{ justifyContent: 'space-between' }}><span>Natural level</span><span>Broadcast loud</span></div>
+          <p className="small muted" style={{ lineHeight: 1.5 }}>Adds clean gain after noise removal, so soft speech reaches broadcast loudness without lifting the room.</p>
+          <div className="row" style={{ marginTop: 'auto', justifyContent: 'space-between', paddingTop: 14, borderTop: '1px solid var(--border-subtle)' }}>
+            <span className="small">Auto-level when I lean away</span>
+            <Switch small label="Auto-level" checked={working.leveler.enabled} onChange={(v) => s.updateWorking((w) => void (w.leveler.enabled = v))} />
           </div>
-        </section>
+        </div>
 
-        {/* Section 3: Essential Controls (3 columns) */}
-        <section aria-label="Essential controls" style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px', minHeight: '260px' }}>
-          {/* Column 1: Voice Boost */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              padding: '22px 24px',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Voice Boost</h2>
-                <span
-                  style={{
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    padding: '3px 8px',
-                    borderRadius: '6px',
-                    background: 'var(--accent-amber-tint)',
-                    color: 'var(--accent-amber-text)',
-                  }}
-                >
-                  For soft speakers
-                </span>
-              </div>
-              <span className="mono" style={{ fontSize: '22px', fontWeight: 500, color: 'var(--text-primary)' }}>
-                {boostLabel}
-              </span>
-            </div>
-
-            <AurelSlider
-              value={boost}
-              onChange={onBoostChange}
-              min={0}
-              max={100}
-              ariaLabel="Voice Boost amount"
-            />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-tertiary)' }}>
-              <span>Natural level</span>
-              <span>Broadcast loud</span>
-            </div>
-            <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
-              Adds clean gain after noise removal, so soft speech reaches broadcast loudness without lifting the room.
-            </p>
-
-            <div
-              style={{
-                marginTop: 'auto',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingTop: '14px',
-                borderTop: '1px solid var(--border-subtle)',
-              }}
-            >
-              <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>Auto-level when I lean away</span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={autoLevel}
-                onClick={() => setAutoLevel(!autoLevel)}
-                aria-label="Auto-level"
-                style={{
-                  width: '40px',
-                  height: '24px',
-                  borderRadius: '12px',
-                  background: autoLevel ? 'var(--accent-amber)' : '#666A73',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: autoLevel ? 'flex-end' : 'flex-start',
-                  padding: '3px',
-                  boxSizing: 'border-box',
-                  border: 0,
-                  cursor: 'pointer',
-                  transition: 'background 0.15s ease',
-                }}
-              >
-                <span style={{ width: '18px', height: '18px', borderRadius: '50%', background: autoLevel ? '#1B1204' : '#B9BBC1' }} />
-              </button>
-            </div>
+        <div className="card col" style={{ gap: 16, padding: '22px 24px' }}>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <h2 className="h3">Background noise</h2>
+            <span className="mono small muted">Room {m.raw.noiseFloorDb > -130 ? `${signed(m.raw.noiseFloorDb, 0)} dB` : '—'}</span>
           </div>
+          <Segmented<NoiseMode>
+            fill
+            label="Noise removal strength"
+            value={noiseOn ? working.noise.mode : 'off'}
+            options={(['off', 'light', 'balanced', 'strong'] as NoiseMode[]).map((v) => ({ value: v, label: NOISE_MODES[v].label }))}
+            onChange={(v) => s.updateWorking((w) => setNoiseMode(w, v))}
+          />
+          <p className="small muted" style={{ lineHeight: 1.5 }}>{NOISE_MODES[noiseOn ? working.noise.mode : 'off'].desc}</p>
+          <RemovingNow />
+        </div>
 
-          {/* Column 2: Background noise */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              padding: '22px 24px',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Background noise</h2>
-              <span className="mono" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                Room {floorLabel}
-              </span>
-            </div>
-
-            <div
-              role="group"
-              aria-label="Noise removal strength"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-                gap: '2px',
-                padding: '3px',
-                background: '#111215',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: '10px',
-              }}
-            >
-              {(['off', 'light', 'balanced', 'strong'] as NoiseCleanupMode[]).map((mode) => {
-                const isSel = noise === mode;
-                return (
-                  <button
-                    key={mode}
-                    type="button"
-                    aria-pressed={isSel}
-                    onClick={() => onNoiseChange(mode)}
-                    style={{
-                      height: '34px',
-                      padding: '0 4px',
-                      border: 0,
-                      borderRadius: '7px',
-                      background: isSel ? '#2B2E34' : 'transparent',
-                      color: isSel ? 'var(--text-primary)' : 'var(--text-secondary)',
-                      fontSize: '12px',
-                      fontWeight: isSel ? 600 : 500,
-                      whiteSpace: 'nowrap',
-                      textOverflow: 'ellipsis',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {NOISE_MAP[mode].label}
-                  </button>
-                );
-              })}
-            </div>
-
-            <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
-              {noiseMap.desc}
-            </p>
-
-            <div
-              style={{
-                marginTop: 'auto',
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: '6px',
-                paddingTop: '14px',
-                borderTop: '1px solid var(--border-subtle)',
-                fontSize: '12px',
-                color: 'var(--text-tertiary)',
-              }}
-            >
-              <span style={{ marginRight: '2px' }}>Removing now</span>
-              <span style={{ padding: '3px 8px', borderRadius: '999px', background: 'var(--bg-control)', color: 'var(--text-secondary)', fontSize: '11px' }}>Fan hum</span>
-              <span style={{ padding: '3px 8px', borderRadius: '999px', background: 'var(--bg-control)', color: 'var(--text-secondary)', fontSize: '11px' }}>Keyboard</span>
-              <span style={{ padding: '3px 8px', borderRadius: '999px', background: 'var(--bg-control)', color: 'var(--text-secondary)', fontSize: '11px' }}>Room echo</span>
-            </div>
+        <div className="card col" style={{ gap: 16, padding: '22px 24px' }}>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <h2 className="h3">Tone</h2>
+            <button className="small" style={{ fontWeight: 500, color: 'var(--accent-text)' }} onClick={() => s.setTab('finetune')}>Open equalizer</button>
           </div>
-
-          {/* Column 3: Tone */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '16px',
-              padding: '22px 24px',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
-              borderRadius: '16px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <h2 style={{ margin: 0, fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>Tone</h2>
-              {onOpenFineTune && (
-                <button
-                  type="button"
-                  onClick={onOpenFineTune}
-                  style={{ fontSize: '13px', fontWeight: 500, color: 'var(--accent-amber)', background: 'none' }}
-                >
-                  Open equalizer
-                </button>
-              )}
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                <span style={{ color: 'var(--text-primary)' }}>Warmth</span>
-                <span className="mono" style={{ color: 'var(--text-secondary)' }}>{warmthLabel}</span>
-              </div>
-              <AurelSlider
-                value={warmth}
-                onChange={onWarmthChange}
-                min={0}
-                max={100}
-                ariaLabel="Warmth"
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
-                <span style={{ color: 'var(--text-primary)' }}>Presence</span>
-                <span className="mono" style={{ color: 'var(--text-secondary)' }}>{presenceLabel}</span>
-              </div>
-              <AurelSlider
-                value={presence}
-                onChange={onPresenceChange}
-                min={0}
-                max={100}
-                ariaLabel="Presence"
-              />
-            </div>
-
-            <p style={{ margin: 0, marginTop: 'auto', fontSize: '13px', lineHeight: 1.5, color: 'var(--text-tertiary)' }}>
-              Warmth adds low-end body like a close-up broadcast mic. Presence brings words forward.
-            </p>
-          </div>
-        </section>
+          <ToneSlider label="Warmth" value={working.tone.warmthDb} onChange={(v) => s.updateWorking((w) => void (w.tone.warmthDb = v))} />
+          <ToneSlider label="Presence" value={working.tone.presenceDb} onChange={(v) => s.updateWorking((w) => void (w.tone.presenceDb = v))} />
+          <p className="small faint" style={{ marginTop: 'auto', lineHeight: 1.5 }}>Warmth adds low-end body like a close-up broadcast mic. Presence brings words forward.</p>
+        </div>
+      </section>
     </div>
   );
-};
+}
+
+function ToneSlider({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
+  return (
+    <div className="col" style={{ gap: 8 }}>
+      <div className="row small" style={{ justifyContent: 'space-between' }}>
+        <span>{label}</span>
+        <span className="mono muted">{fmtDb(value, 1)}</span>
+      </div>
+      <Slider label={label} value={value} min={-TONE_RANGE_DB} max={TONE_RANGE_DB} step={0.1} valueText={fmtDb(value, 1)} onChange={onChange} />
+    </div>
+  );
+}
+
+function Stat({ label, value, warn }: { label: string; value: string; warn?: boolean }) {
+  return (
+    <div className="col" style={{ gap: 4 }}>
+      <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{label}</span>
+      <span className="mono" style={{ fontSize: 15, fontWeight: 500, color: warn ? 'var(--error-text)' : undefined }}>{value}</span>
+    </div>
+  );
+}
+
+// Enhanced level bar with the broadcast target range marked.
+function TargetBar({ db }: { db: number }) {
+  const x = (v: number) => `${((v + 60) / 60) * 100}%`;
+  return (
+    <div style={{ position: 'relative' }}>
+      <LevelBar db={db} />
+      <span aria-hidden="true" style={{ position: 'absolute', top: -3, bottom: -3, left: x(TARGET_LOW), width: `${((TARGET_HIGH - TARGET_LOW) / 60) * 100}%`, border: '1.5px solid var(--success)', borderRadius: 3 }} />
+    </div>
+  );
+}
+
+function useHeldMax(v: number, holdMs: number): number {
+  const ref = useRef({ v: -140, at: 0 });
+  const now = performance.now();
+  if (v >= ref.current.v || now - ref.current.at > holdMs) ref.current = { v, at: now };
+  return ref.current.v;
+}
+
+function RemovingNow() {
+  const s = useStudio();
+  const m = useMeters(500);
+  const counts = useRef({ pops: m.pops, clicks: m.clicks, popAt: 0, clickAt: 0 });
+  const now = Date.now();
+  const c = counts.current;
+  if (m.pops > c.pops) { c.popAt = now; c.pops = m.pops; }
+  if (m.clicks > c.clicks) { c.clickAt = now; c.clicks = m.clicks; }
+  const w = s.working;
+  const on = s.live.enhancementOn;
+  const chips: string[] = [];
+  if (on && w.noise.enabled && w.noise.mode !== 'off') {
+    if (m.humDb > -80) chips.push('Steady hum');
+    if (m.noiseInDb > -70) chips.push('Room noise');
+    if (w.noise.reduceEcho && m.echo > 0.04) chips.push('Room echo');
+  }
+  if (on && w.clicks.enabled && now - c.clickAt < 15000) chips.push('Mouth clicks');
+  if (on && w.pops.enabled && now - c.popAt < 15000) chips.push('Pops');
+  return (
+    <div className="row xsmall faint" style={{ marginTop: 'auto', gap: 8, paddingTop: 14, borderTop: '1px solid var(--border-subtle)', flexWrap: 'wrap' }}>
+      <span>Removing now</span>
+      {chips.length ? chips.map((t) => <span key={t} className="chip" style={{ fontWeight: 400 }}>{t}</span>) : <span>Nothing right now</span>}
+    </div>
+  );
+}
+
+// Board 12 · Mic unplugged mid-meeting.
+function UnpluggedBanner() {
+  const s = useStudio();
+  const lostAt = useRef<number | null>(null);
+  const [, tick] = useState(0);
+  const lost = s.status.inputLost || s.inputMissing;
+  if (lost && lostAt.current === null) lostAt.current = Date.now();
+  if (!lost) lostAt.current = null;
+  useEffect(() => {
+    if (!lost) return;
+    const t = setInterval(() => tick((x) => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [lost]);
+  if (!lost) return null;
+  const other = s.inputs.find((d) => d.deviceId !== s.prefs.inputId);
+  const secs = Math.round((Date.now() - (lostAt.current || Date.now())) / 1000);
+  return (
+    <section role="alert" className="banner-error row" style={{ gap: 20, padding: '18px 22px', flexShrink: 0 }}>
+      <span className="row" style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--error-tint)', justifyContent: 'center', color: 'var(--error-text)' }}>
+        <Icon name="micOff" size={22} />
+      </span>
+      <div className="col grow" style={{ gap: 4 }}>
+        <span className="h3">{s.inputLabel} was unplugged</span>
+        <span className="small muted">Aurel keeps sending silence to CABLE Output, so your meeting won’t jump to a different mic. Plug it back in and your voice returns on its own, with the same profile and settings.</span>
+        <span className="xsmall faint">Looking for it · lost {secs < 60 ? `${secs} seconds` : `${Math.round(secs / 60)} min`} ago</span>
+      </div>
+      {other && (
+        <button className="btn btn-primary" onClick={() => s.setPrefs({ inputId: other.deviceId })}>
+          Use {shortLabel(other.label)} for now
+        </button>
+      )}
+      <button className="btn" onClick={() => s.setTab('settings')}>Choose another mic</button>
+    </section>
+  );
+}
+
+// Board 13 · Voice too loud (clipping).
+function ClippingBanner() {
+  const s = useStudio();
+  const [clip, setClip] = useState<null | 'output' | 'input'>(null);
+  const [dismissedAt, setDismissedAt] = useState(-Infinity);
+  useEffect(() => {
+    const hits: number[] = [];
+    return engine.onMeters((m) => {
+      const now = performance.now();
+      if (m.raw.peakDb > -0.3) hits.push(now);
+      else if (m.out.limiterDb < -6 && m.speaking) hits.push(-now);
+      while (hits.length && Math.abs(hits[0]) < now - 5000) hits.shift();
+      if (hits.length >= 3 && now - dismissedAt > 60000) setClip(hits.some((h) => h > 0) ? 'input' : 'output');
+    });
+  }, [dismissedAt]);
+  if (!clip || !s.live.enhancementOn) return null;
+  const lower = Math.max(0, s.live.boostDb - 4);
+  const close = () => {
+    setClip(null);
+    setDismissedAt(performance.now());
+  };
+  return (
+    <section role="alert" className="banner-error row" style={{ gap: 20, padding: '18px 22px', flexShrink: 0 }}>
+      <span className="row" style={{ width: 44, height: 44, borderRadius: 12, background: 'var(--error-tint)', justifyContent: 'center', color: 'var(--error-text)' }}>
+        <Icon name="alert" size={22} />
+      </span>
+      <div className="col grow" style={{ gap: 4 }}>
+        <span className="h3">{clip === 'input' ? 'Your mic itself is clipping' : 'Your voice is clipping'}</span>
+        <span className="small muted">
+          {clip === 'input'
+            ? 'The signal is already distorted before Aurel gets it. Turn down the gain knob on your mic or interface, or lower the mic level in Windows sound settings.'
+            : 'Loud words are hitting the ceiling and will sound crunchy to listeners. Aurel’s limiter is catching most of it, but not all.'}
+        </span>
+      </div>
+      {clip === 'output' ? (
+        <>
+          <button className="btn btn-primary" onClick={() => { s.setLive({ boostDb: lower }); close(); }}>Lower boost to {fmtDb(lower, 0)}</button>
+          <button className="btn" onClick={close}>Keep it loud</button>
+        </>
+      ) : (
+        <>
+          <button className="btn" onClick={() => window.studioAPI?.openSoundSettings()}>Open sound settings</button>
+          <button className="btn btn-ghost" onClick={close}>Dismiss</button>
+        </>
+      )}
+    </section>
+  );
+}

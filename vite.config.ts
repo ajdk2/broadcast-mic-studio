@@ -1,18 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import styleX from 'vite-plugin-stylex';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    styleX({
-      unstable_moduleResolution: {
-        type: 'commonJS',
-        rootDir: __dirname,
-      },
-    }),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

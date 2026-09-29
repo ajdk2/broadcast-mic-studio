@@ -1,31 +1,33 @@
 {
   "name": "broadcast-mic-studio",
   "version": "1.0.0",
-  "description": "",
+  "description": "Broadcast-grade voice enhancement for Windows",
   "main": "dist-electron/main.js",
   "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.electron.json",
+    "test": "vitest run",
     "build:vite": "vite build",
     "build:electron": "tsc -p tsconfig.electron.json",
-    "build": "npm run build:vite && npm run build:electron",
+    "build": "npm run typecheck && npm run build:vite && npm run build:electron",
     "dev:vite": "vite",
-    "dev:electron": "cross-env NODE_ENV=development electron .",
-    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
-    "start": "cross-env NODE_ENV=production electron ."
+    "dev:electron": "tsc -p tsconfig.electron.json && cross-env NODE_ENV=development electron .",
+    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && npm run dev:electron\"",
+    "start": "cross-env NODE_ENV=production electron .",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3",
+    "dist:win": "npm run build && electron-builder --win --x64 --publish never",
+    "icons": "node scripts/make-icon.mjs"
   },
   "keywords": [],
-  "author": "",
+  "author": "Aljon Dequito",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@stylexjs/stylex": "^0.19.1",
-    "better-sqlite3": "^13.0.3",
-    "lucide-react": "^1.48.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "sql.js": "^1.14.2"
+    "better-sqlite3": "^13.0.3"
   },
   "devDependencies": {
-    "@stylexjs/rollup-plugin": "^0.19.1",
+    "@electron/rebuild": "^4.2.0",
+    "@fontsource/geist-mono": "^5.3.0",
+    "@fontsource/geist-sans": "^5.3.0",
     "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^26.6.3",
     "@types/react": "^19.3.0",
@@ -34,9 +36,58 @@
     "concurrently": "^10.0.5",
     "cross-env": "^10.1.0",
     "electron": "^44.4.5",
+    "electron-builder": "^26.15.3",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.1",
-    "vite-plugin-stylex": "^0.13.0",
+    "vitest": "^5.0.2",
     "wait-on": "^9.1.0"
+  },
+  "productName": "Aurel Voice Studio",
+  "build": {
+    "appId": "com.aurel.voicestudio",
+    "productName": "Aurel Voice Studio",
+    "copyright": "Copyright © 2026 Aljon Dequito",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json",
+      "!**/node_modules/better-sqlite3/{deps,src,docs}/**"
+    ],
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**"
+    ],
+    "npmRebuild": true,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Aurel-Voice-Studio-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Aurel Voice Studio",
+      "runAfterFinish": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "uninstallDisplayName": "Aurel Voice Studio",
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": null
   }
 }
