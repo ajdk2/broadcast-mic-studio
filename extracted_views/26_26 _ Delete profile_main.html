@@ -1,0 +1,105 @@
+<main style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 30px 40px 28px; box-sizing: border-box; min-height: 0">
+<div style="display: flex; align-items: center; justify-content: space-between; height: 60px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.02em">Profiles</h1>
+<span style="font-size: 14px; color: #8C9098">A profile saves every setting in the voice chain. Switch with a shortcut, or let Aurel switch for you.</span>
+</div>
+<div style="display: flex; gap: 10px">
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #17191C; border: 1px solid #33373E; border-radius: 10px; font-size: 13px; font-weight: 500">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 10l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg>Import .aurel file</button>
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 18px; background: #F5A623; border: 0; border-radius: 10px; font-size: 13px; font-weight: 600; color: #1B1204">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>New profile</button>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; gap: 24px; min-height: 0">
+<nav aria-label="Profiles" style="width: 420px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; padding: 18px 12px; box-sizing: border-box; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<span style="padding: 4px 12px 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">Yours</span>
+<sc-for list="{{mine}}" as="p" hint-placeholder-count="2">
+<button sc-camel-on-click="{{p.pick}}" aria-current="{{p.current}}" style="position: relative; height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; text-align: left">
+<sc-if value="{{p.selected}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 10px; background: #1F2227; border: 1px solid #3A3E46; pointer-events: none"></span></sc-if>
+<svg width="64" height="28" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true" style="position: relative; flex-shrink: 0"><path d="{{p.curve}}" fill="none" stroke="{{p.stroke}}" stroke-width="5" stroke-linecap="round"></path></svg>
+<span style="position: relative; flex-grow: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 500; color: #F3F2EF">{{p.name}}</span><span style="font-size: 12px; color: #8C9098">{{p.sub}}</span></span>
+<sc-if value="{{p.inUse}}" hint-placeholder-val="{{false}}"><span style="position: relative; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #2A2111; color: #FFC869">In use</span></sc-if>
+</button>
+</sc-for>
+<span style="padding: 16px 12px 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">Built in</span>
+<sc-for list="{{builtin}}" as="p" hint-placeholder-count="5">
+<button sc-camel-on-click="{{p.pick}}" aria-current="{{p.current}}" style="position: relative; height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; text-align: left">
+<sc-if value="{{p.selected}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 10px; background: #1F2227; border: 1px solid #3A3E46; pointer-events: none"></span></sc-if>
+<svg width="64" height="28" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true" style="position: relative; flex-shrink: 0"><path d="{{p.curve}}" fill="none" stroke="{{p.stroke}}" stroke-width="5" stroke-linecap="round"></path></svg>
+<span style="position: relative; flex-grow: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 500; color: #F3F2EF">{{p.name}}</span><span style="font-size: 12px; color: #8C9098">{{p.sub}}</span></span>
+<sc-if value="{{p.inUse}}" hint-placeholder-val="{{false}}"><span style="position: relative; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #2A2111; color: #FFC869">In use</span></sc-if>
+</button>
+</sc-for>
+</nav>
+
+<section aria-labelledby="pd-h" style="flex-grow: 1; display: flex; flex-direction: column; gap: 22px; padding: 28px 32px; box-sizing: border-box; background: #16181B; border: 1px solid #24272C; border-radius: 16px; min-width: 0">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 id="pd-h" style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">{{sel.name}}</h2>
+<sc-if value="{{sel.custom}}" hint-placeholder-val="{{true}}"><button aria-label="Rename profile" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: transparent; border: 0; color: #B9BBC1"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path><path d="m13.5 6.5 4 4"></path></svg></button></sc-if>
+<sc-if value="{{sel.builtIn}}" hint-placeholder-val="{{false}}"><span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: #22252A; color: #B9BBC1"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Built in</span></sc-if>
+</div>
+<span style="font-size: 14px; color: #8C9098">{{sel.meta}}</span>
+</div>
+<div style="display: flex; gap: 10px; flex-shrink: 0">
+<a href="FineTune.dc.html" style="height: 40px; display: flex; align-items: center; padding: 0 16px; border-radius: 10px; background: #17191C; border: 1px solid #33373E; box-sizing: border-box; font-size: 13px; font-weight: 500; color: #F3F2EF">Edit in Fine-tune</a>
+<sc-if value="{{sel.notInUse}}" hint-placeholder-val="{{true}}"><button sc-camel-on-click="{{useSel}}" style="height: 40px; padding: 0 18px; border-radius: 10px; background: #F5A623; border: 0; color: #1B1204; font-size: 13px; font-weight: 600">Use this profile</button></sc-if>
+<sc-if value="{{sel.inUse}}" hint-placeholder-val="{{false}}"><span style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 10px; background: #2A2111; color: #FFC869; font-size: 13px; font-weight: 600; box-sizing: border-box"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>In use now</span></sc-if>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; border-radius: 12px; background: #111215; border: 1px solid #22252A">
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #8C9098"><span>Sound signature</span><span class="mono">20 Hz · 200 Hz · 2 kHz · 20 kHz</span></div>
+<svg width="1044" height="120" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true"><line x1="0" y1="24" x2="260" y2="24" stroke="#2A2D33" stroke-width="0.4" stroke-dasharray="1 1.5"></line><path d="{{sel.curve}}" fill="none" stroke="#F5A623" stroke-width="0.9" stroke-linecap="round"></path></svg>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{sel.stats}}" as="t" hint-placeholder-count="8">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E"><span style="font-size: 12px; color: #8C9098">{{t.k}}</span><span class="mono" style="font-size: 15px; font-weight: 500">{{t.v}}</span></div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 600">Switch to this profile automatically</span>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E">
+<span style="font-size: 13px; color: #B9BBC1">{{sel.rule}}</span>
+<button type="button" role="switch" aria-checked="{{sel.ruleOn}}" aria-label="Automatic switching rule" style="width: 40px; height: 24px; border-radius: 12px; background: {{sel.ruleBg}}; display: flex; align-items: center; justify-content: {{sel.ruleJustify}}; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: {{sel.ruleKnob}}"></span></button>
+</div>
+<button style="align-self: flex-start; height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px dashed #3A3E46; font-size: 12px; color: #B9BBC1"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Add a rule</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 600">Shortcut</span>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E">
+<span style="display: flex; gap: 4px"><kbd class="mono" style="height: 28px; padding: 0 8px; display: flex; align-items: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Ctrl</kbd><kbd class="mono" style="height: 28px; padding: 0 8px; display: flex; align-items: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Alt</kbd><kbd class="mono" style="height: 28px; padding: 0 8px; display: flex; align-items: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">{{sel.key}}</kbd></span>
+<button style="height: 30px; padding: 0 10px; border-radius: 6px; background: transparent; border: 0; font-size: 12px; font-weight: 500; color: #F5A623">Change</button>
+</div>
+</div>
+</div>
+
+<div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding-top: 18px; border-top: 1px solid #24272C">
+<button style="height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg>Duplicate</button>
+<button style="height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg>Export as file</button>
+<sc-if value="{{sel.builtIn}}" hint-placeholder-val="{{false}}"><button style="height: 38px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; font-weight: 500">Reset to original</button></sc-if>
+<sc-if value="{{sel.custom}}" hint-placeholder-val="{{true}}"><button style="margin-left: auto; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #5C2A24; color: #FF8A7E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>Delete profile</button></sc-if>
+</div>
+</section>
+</div>
+</div>
+
+<footer style="height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-top: 1px solid #1C1E22; background: #0F1012; font-size: 12px; color: #8C9098">
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="display: flex; align-items: center; gap: 6px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #43D18A"></span>Audio engine running</span>
+<span class="mono">48 kHz · 24-bit · buffer 256 · total delay 9.4 ms</span>
+</div>
+<div style="display: flex; align-items: center; gap: 20px">
+<span class="mono">CPU 2.1%</span>
+<span>No internet needed</span>
+<span class="mono">v1.0</span>
+</div>
+</footer>
+</main>

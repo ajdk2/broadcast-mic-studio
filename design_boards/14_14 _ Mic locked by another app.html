@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Aurel — Microphone locked by another app</title>
+<script src="6c803ff3-ba05-4143-a374-03481bff0893"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ee918c31-8b18-4bbe-8fea-5822838a8cf0") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1446088f-08a6-41bb-a4b2-0febf00a9434") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0576f365-ef1c-4c9e-974f-e0b682bbd999") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("334f62e2-f698-463c-8027-1333204dd455") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1b86d970-a973-4465-8bc8-d92d36670964") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ee918c31-8b18-4bbe-8fea-5822838a8cf0") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("1446088f-08a6-41bb-a4b2-0febf00a9434") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0576f365-ef1c-4c9e-974f-e0b682bbd999") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("334f62e2-f698-463c-8027-1333204dd455") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("1b86d970-a973-4465-8bc8-d92d36670964") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ee918c31-8b18-4bbe-8fea-5822838a8cf0") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1446088f-08a6-41bb-a4b2-0febf00a9434") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0576f365-ef1c-4c9e-974f-e0b682bbd999") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("334f62e2-f698-463c-8027-1333204dd455") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1b86d970-a973-4465-8bc8-d92d36670964") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("ee918c31-8b18-4bbe-8fea-5822838a8cf0") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("1446088f-08a6-41bb-a4b2-0febf00a9434") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("0576f365-ef1c-4c9e-974f-e0b682bbd999") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("334f62e2-f698-463c-8027-1333204dd455") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("1b86d970-a973-4465-8bc8-d92d36670964") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a7d7510d-872c-450d-be54-1262693c7c4d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e997a91f-41cf-4d47-b09f-f702e89b7c7c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("8342c0a9-58c5-4739-b2ef-1e7a8c187516") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("bebf61f5-b995-466b-a064-e5f24c410388") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("cd88dc2c-4896-4146-bb30-fd7bd8a7ab6b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0001f780-9231-47a2-9b23-f2c57f00c280") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a7d7510d-872c-450d-be54-1262693c7c4d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e997a91f-41cf-4d47-b09f-f702e89b7c7c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("8342c0a9-58c5-4739-b2ef-1e7a8c187516") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("bebf61f5-b995-466b-a064-e5f24c410388") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("cd88dc2c-4896-4146-bb30-fd7bd8a7ab6b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0001f780-9231-47a2-9b23-f2c57f00c280") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a7d7510d-872c-450d-be54-1262693c7c4d") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e997a91f-41cf-4d47-b09f-f702e89b7c7c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("8342c0a9-58c5-4739-b2ef-1e7a8c187516") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("bebf61f5-b995-466b-a064-e5f24c410388") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("cd88dc2c-4896-4146-bb30-fd7bd8a7ab6b") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0001f780-9231-47a2-9b23-f2c57f00c280") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+body{margin:0;background:#0D0E10;color:#F3F2EF;font-family:'Geist','Segoe UI Variable Text','Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#F5A623;text-decoration:none}a:hover{color:#FFC061}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #F5A623;outline-offset:2px}
+.mono{font-family:'Geist Mono','Cascadia Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+div:has(> .range:focus-visible){outline:2px solid #F5A623;outline-offset:4px;border-radius:8px}
+.range{position:absolute;left:0;top:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.nav:hover{background:#1A1C20}
+.card-btn:hover{border-color:#3A3E46}
+.ghost:hover{background:#22252A}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; display: flex; flex-direction: column; background: #0D0E10; overflow: hidden">
+
+<header style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding-left: 16px; border-bottom: 1px solid #1C1E22">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="16" height="16" sc-camel-view-box="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#F5A623"></rect><path d="M8 14v0M11 10.5v7M14 7.5v13M17 10.5v7M20 13.5v1" stroke="#1B1204" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span style="font-size: 12px; color: #B9BBC1">Aurel Voice Studio</span>
+</div>
+<div style="display: flex">
+<button aria-label="Minimize" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><path d="M0 5.5h10" stroke="currentColor"></path></svg></button>
+<button aria-label="Maximize" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor"></rect></svg></button>
+<button aria-label="Close" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><path d="M0.5 0.5l9 9M9.5 0.5l-9 9" stroke="currentColor"></path></svg></button>
+</div>
+</header>
+
+<div style="flex-grow: 1; display: flex; min-height: 0">
+
+<nav aria-label="Primary" style="width: 248px; flex-shrink: 0; background: #111215; border-right: 1px solid #1C1E22; display: flex; flex-direction: column; gap: 28px; padding: 22px 14px 18px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 12px; padding: 0 8px">
+<svg width="32" height="32" sc-camel-view-box="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#F5A623"></rect><path d="M8 14v0M11 10.5v7M14 7.5v13M17 10.5v7M20 13.5v1" stroke="#1B1204" stroke-width="2.2" stroke-linecap="round"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Aurel</span>
+<span style="font-size: 12px; color: #8C9098">Voice Studio</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a class="nav" href="Main.dc.html" aria-current="page" style="position: relative; height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; background: #1D1F24; color: #F3F2EF; font-size: 14px; font-weight: 500">
+<span style="position: absolute; left: 0; top: 12px; width: 3px; height: 16px; border-radius: 2px; background: #F5A623"></span>
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12h1M7 8v8M11 4v16M15 8v8M19 11v2"></path></svg>
+Studio</a>
+<a class="nav" href="Profiles.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"></path><path d="m3 13 9 5 9-5"></path></svg>
+Profiles</a>
+<a class="nav" href="FineTune.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"></path><circle cx="15" cy="6" r="2"></circle><circle cx="9" cy="12" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg>
+Fine-tune</a>
+<a class="nav" href="Connect.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path></svg>
+Connect apps</a>
+<a class="nav" href="Settings.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"></path></svg>
+Settings</a>
+</div>
+
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+<div style="background: #17191C; border: 1px solid #24272C; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">Input</span>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 36px; height: 36px; border-radius: 9px; background: #23262B; display: flex; align-items: center; justify-content: center; color: #F3F2EF">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; font-weight: 600">USB Microphone</span>
+<span style="font-size: 12px; color: #8C9098">USB · 48 kHz</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #43D18A"></span>Connected</span>
+<a href="Setup.dc.html" style="font-size: 12px; font-weight: 500">Run voice check</a>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 8px; font-size: 12px; color: #8C9098">
+<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3z"></path></svg>
+Offline · processed on this PC
+</div>
+</div>
+</nav>
+
+<main style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 30px 40px 28px; box-sizing: border-box">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 60px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.02em">Studio</h1>
+<div style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: #8C9098">
+<span>USB Microphone</span>
+<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+<span style="color: #B9BBC1">Aurel Microphone</span>
+<span>· used by Microsoft Teams, OBS Studio</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="font-size: 12px; color: #8C9098">Headphone preview</span>
+<div role="group" aria-label="Headphone preview" style="display: flex; gap: 2px; padding: 3px; background: #15171A; border: 1px solid #26292E; border-radius: 10px">
+<sc-for list="{{views}}" as="v" hint-placeholder-count="2">
+<sc-if value="{{v.selected}}" hint-placeholder-val="{{false}}">
+<button aria-pressed="true" sc-camel-on-click="{{v.pick}}" style="height: 34px; padding: 0 16px; border: 0; border-radius: 7px; background: #2B2E34; color: #F3F2EF; font-size: 13px; font-weight: 500">{{v.label}}</button>
+</sc-if>
+<sc-if value="{{v.unselected}}" hint-placeholder-val="{{true}}">
+<button aria-pressed="false" sc-camel-on-click="{{v.pick}}" style="height: 34px; padding: 0 16px; border: 0; border-radius: 7px; background: transparent; color: #B9BBC1; font-size: 13px; font-weight: 500">{{v.label}}</button>
+</sc-if>
+</sc-for>
+</div>
+<a href="TestRecording.dc.html" style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #17191C; border: 1px solid #26292E; border-radius: 10px; box-sizing: border-box; font-size: 13px; font-weight: 500; color: #F3F2EF">
+<svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3.5" fill="#FF6A5C" stroke="none"></circle></svg>
+Test my sound</a>
+<button class="ghost" sc-camel-on-click="{{toggleMonitor}}" aria-pressed="{{monitor}}" style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #17191C; border: 1px solid #26292E; border-radius: 10px; font-size: 13px; font-weight: 500; color: #F3F2EF">
+<svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><rect x="3" y="14" width="4" height="6" rx="1.5"></rect><rect x="17" y="14" width="4" height="6" rx="1.5"></rect></svg>
+{{monitorLabel}}</button>
+<div style="width: 1px; height: 28px; background: #26292E"></div>
+<sc-if value="{{on}}" hint-placeholder-val="{{true}}">
+<button role="switch" aria-checked="true" sc-camel-on-click="{{togglePower}}" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 8px 0 16px; background: #231B0D; border: 1px solid #5A4213; border-radius: 10px; font-size: 13px; font-weight: 600; color: #FFC869">
+Enhancement on
+<span style="width: 40px; height: 24px; border-radius: 12px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1B1204"></span></span>
+</button>
+</sc-if>
+<sc-if value="{{off}}" hint-placeholder-val="{{false}}">
+<button role="switch" aria-checked="false" sc-camel-on-click="{{togglePower}}" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 8px 0 16px; background: #17191C; border: 1px solid #33373E; border-radius: 10px; font-size: 13px; font-weight: 600; color: #B9BBC1">
+Bypassed — raw mic
+<span style="width: 40px; height: 24px; border-radius: 12px; background: #666A73; display: flex; align-items: center; justify-content: flex-start; padding: 3px; box-sizing: border-box"><span style="width: 18px; height: 18px; border-radius: 50%; background: #B9BBC1"></span></span>
+</button>
+</sc-if>
+</div>
+</div>
+
+<section aria-label="Live voice" style="height: 348px; display: flex; background: #16181B; border: 1px solid #24272C; border-radius: 16px; overflow: hidden">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 26px 28px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #FF6A5C"></span>
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Live voice</h2>
+<span style="font-size: 13px; color: #8C9098">{{liveCaption}}</span>
+</div>
+<div style="display: flex; align-items: center; gap: 18px; font-size: 12px; color: #B9BBC1">
+<span style="display: flex; align-items: center; gap: 8px"><span style="width: 14px; height: 4px; border-radius: 2px; background: #9EA1A8"></span>Your raw mic</span>
+<span style="display: flex; align-items: center; gap: 8px"><span style="width: 14px; height: 4px; border-radius: 2px; background: #F5A623"></span>Enhanced by Aurel</span>
+</div>
+</div>
+<svg width="1120" height="220" sc-camel-view-box="0 0 1120 220" role="img" aria-label="Live waveform comparing raw and enhanced voice">
+<line x1="0" y1="10" x2="1120" y2="10" stroke="#202328" stroke-dasharray="2 6"></line>
+<line x1="0" y1="210" x2="1120" y2="210" stroke="#202328" stroke-dasharray="2 6"></line>
+<line x1="0" y1="110" x2="1120" y2="110" stroke="#2A2D33"></line>
+<path d="{{outD}}" stroke="#F5A623" stroke-width="4.5" stroke-linecap="round" fill="none" opacity="{{outOpacity}}"></path>
+<path d="{{inD}}" stroke="{{inStroke}}" stroke-width="4.5" stroke-linecap="round" fill="none"></path>
+</svg>
+<div class="mono" style="width: 1120px; display: flex; justify-content: space-between; font-size: 11px; color: #8C9098">
+<span>−12 s</span><span>−9 s</span><span>−6 s</span><span>−3 s</span><span>Now</span>
+</div>
+</div>
+<div style="width: 380px; flex-shrink: 0; border-left: 1px solid #24272C; background: #141619; display: flex; flex-direction: column; gap: 22px; padding: 26px 28px; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: #8C9098">Output loudness</span>
+<div style="display: flex; align-items: baseline; gap: 8px">
+<span class="mono" style="font-size: 52px; font-weight: 500; letter-spacing: -0.03em; line-height: 1">{{outLabel}}</span>
+<span style="font-size: 15px; color: #B9BBC1">LUFS</span>
+</div>
+<span style="font-size: 13px; color: {{statusColor}}">{{statusText}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #B9BBC1">Raw mic</span><span class="mono" style="color: #B9BBC1">−41.8</span></div>
+<svg width="324" height="8" sc-camel-view-box="0 0 324 8" aria-hidden="true"><rect width="324" height="8" rx="4" fill="#23262B"></rect><rect width="{{inW}}" height="8" rx="4" fill="#9EA1A8"></rect></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #B9BBC1">Enhanced</span><span class="mono" style="color: #F3F2EF">{{outLabel}}</span></div>
+<svg width="324" height="8" sc-camel-view-box="0 0 324 8" aria-hidden="true"><rect width="324" height="8" rx="4" fill="#23262B"></rect><rect width="{{outW}}" height="8" rx="4" fill="#F5A623"></rect><rect x="237" y="0" width="2" height="8" fill="#F3F2EF"></rect></svg>
+<div class="mono" style="display: flex; justify-content: space-between; font-size: 10px; color: #8C9098"><span>−60</span><span>−40</span><span>−20</span><span>0</span></div>
+</div>
+</div>
+<div style="margin-top: auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-top: 18px; border-top: 1px solid #24272C">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 11px; color: #8C9098">Voice lift</span><span class="mono" style="font-size: 15px; font-weight: 500">{{liftLabel}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 11px; color: #8C9098">Noise floor</span><span class="mono" style="font-size: 15px; font-weight: 500">{{floorLabel}}</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 11px; color: #8C9098">True peak</span><span class="mono" style="font-size: 15px; font-weight: 500">−1.0 dB</span></div>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="profiles-h" style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: baseline; gap: 12px">
+<h2 id="profiles-h" style="margin: 0; font-size: 17px; font-weight: 600">Sound profile</h2>
+<span style="font-size: 13px; color: #8C9098">Pick the character you want. Every profile keeps your Voice Boost.</span>
+</div>
+<a href="FineTune.dc.html" style="font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px">Customize current profile
+<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{profiles}}" as="p" hint-placeholder-count="5">
+<button class="card-btn" sc-camel-on-click="{{p.pick}}" aria-pressed="{{p.selected}}" style="position: relative; height: 172px; display: flex; flex-direction: column; gap: 12px; padding: 18px 20px; box-sizing: border-box; text-align: left; background: #16181B; border: 1px solid #24272C; border-radius: 14px">
+<sc-if value="{{p.selected}}" hint-placeholder-val="{{false}}">
+<span style="position: absolute; left: -1px; top: -1px; right: -1px; bottom: -1px; border: 2px solid #F5A623; border-radius: 14px; pointer-events: none"></span>
+<span style="position: absolute; right: 14px; top: 14px; width: 22px; height: 22px; border-radius: 50%; background: #F5A623; display: flex; align-items: center; justify-content: center"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="#1B1204" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+</sc-if>
+<svg width="200" height="38" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true"><line x1="0" y1="24" x2="260" y2="24" stroke="#2A2D33" stroke-dasharray="3 4"></line><path d="{{p.curve}}" fill="none" stroke="{{p.stroke}}" stroke-width="2.5" stroke-linecap="round"></path></svg>
+<span style="font-size: 16px; font-weight: 600; color: #F3F2EF">{{p.name}}</span>
+<span style="font-size: 13px; line-height: 1.45; color: #B9BBC1">{{p.desc}}</span>
+<span style="margin-top: auto; font-size: 12px; color: #8C9098">{{p.tags}}</span>
+</button>
+</sc-for>
+</div>
+</section>
+
+<section aria-label="Essential controls" style="flex-grow: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 22px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Voice Boost</h2>
+<span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #2A2111; color: #FFC869">For soft speakers</span>
+</div>
+<span class="mono" style="font-size: 22px; font-weight: 500; color: #F3F2EF">{{boostLabel}}</span>
+</div>
+<div style="position: relative; width: 466px; height: 24px">
+<svg width="466" height="24" sc-camel-view-box="0 0 466 24" aria-hidden="true"><rect x="0" y="10" width="466" height="4" rx="2" fill="#666A73"></rect><rect x="0" y="10" width="{{boostW}}" height="4" rx="2" fill="#F5A623"></rect><circle cx="{{boostX}}" cy="12" r="9" fill="#F3F2EF"></circle></svg>
+<input class="range" type="range" min="0" max="100" value="{{boost}}" sc-camel-on-change="{{onBoost}}" aria-label="Voice Boost amount">
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #8C9098"><span>Natural level</span><span>Broadcast loud</span></div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #B9BBC1">Adds clean gain after noise removal, so soft speech reaches broadcast loudness without lifting the room.</p>
+<div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #24272C">
+<span style="font-size: 13px; color: #F3F2EF">Auto-level when I lean away</span>
+<button type="button" role="switch" aria-checked="true" aria-label="Auto-level" style="width: 40px; height: 24px; border-radius: 12px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1B1204"></span></button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 22px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Background noise</h2>
+<span class="mono" style="font-size: 13px; color: #B9BBC1">Room {{floorLabel}}</span>
+</div>
+<div role="group" aria-label="Noise removal strength" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 3px; background: #111215; border: 1px solid #26292E; border-radius: 10px">
+<sc-for list="{{noiseOpts}}" as="o" hint-placeholder-count="4">
+<sc-if value="{{o.selected}}" hint-placeholder-val="{{false}}">
+<button aria-pressed="true" sc-camel-on-click="{{o.pick}}" style="height: 34px; border: 0; border-radius: 7px; background: #2B2E34; color: #F3F2EF; font-size: 13px; font-weight: 500">{{o.label}}</button>
+</sc-if>
+<sc-if value="{{o.unselected}}" hint-placeholder-val="{{true}}">
+<button aria-pressed="false" sc-camel-on-click="{{o.pick}}" style="height: 34px; border: 0; border-radius: 7px; background: transparent; color: #B9BBC1; font-size: 13px; font-weight: 500">{{o.label}}</button>
+</sc-if>
+</sc-for>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #B9BBC1">{{noiseHelp}}</p>
+<div style="margin-top: auto; display: flex; align-items: center; gap: 8px; padding-top: 14px; border-top: 1px solid #24272C; font-size: 12px; color: #8C9098">
+<span>Removing now</span>
+<span style="padding: 4px 10px; border-radius: 999px; background: #22252A; color: #B9BBC1">Fan hum</span>
+<span style="padding: 4px 10px; border-radius: 999px; background: #22252A; color: #B9BBC1">Keyboard</span>
+<span style="padding: 4px 10px; border-radius: 999px; background: #22252A; color: #B9BBC1">Room echo</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px; padding: 22px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Tone</h2>
+<a href="FineTune.dc.html" style="font-size: 13px; font-weight: 500">Open equalizer</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: #F3F2EF">Warmth</span><span class="mono" style="color: #B9BBC1">{{warmthLabel}}</span></div>
+<div style="position: relative; width: 466px; height: 24px">
+<svg width="466" height="24" sc-camel-view-box="0 0 466 24" aria-hidden="true"><rect x="0" y="10" width="466" height="4" rx="2" fill="#666A73"></rect><rect x="0" y="10" width="{{warmthW}}" height="4" rx="2" fill="#F5A623"></rect><circle cx="{{warmthX}}" cy="12" r="9" fill="#F3F2EF"></circle></svg>
+<input class="range" type="range" min="0" max="100" value="{{warmth}}" sc-camel-on-change="{{onWarmth}}" aria-label="Warmth">
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: #F3F2EF">Presence</span><span class="mono" style="color: #B9BBC1">{{presenceLabel}}</span></div>
+<div style="position: relative; width: 466px; height: 24px">
+<svg width="466" height="24" sc-camel-view-box="0 0 466 24" aria-hidden="true"><rect x="0" y="10" width="466" height="4" rx="2" fill="#666A73"></rect><rect x="0" y="10" width="{{presenceW}}" height="4" rx="2" fill="#F5A623"></rect><circle cx="{{presenceX}}" cy="12" r="9" fill="#F3F2EF"></circle></svg>
+<input class="range" type="range" min="0" max="100" value="{{presence}}" sc-camel-on-change="{{onPresence}}" aria-label="Presence">
+</div>
+</div>
+<p style="margin: 0; margin-top: auto; font-size: 13px; line-height: 1.5; color: #8C9098">Warmth adds low-end body like a close-up broadcast mic. Presence brings words forward.</p>
+</div>
+
+</section>
+</div>
+
+<footer style="height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-top: 1px solid #1C1E22; background: #0F1012; font-size: 12px; color: #8C9098">
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="display: flex; align-items: center; gap: 6px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #FF6A5C"></span>Input blocked by another app</span>
+<span class="mono">48 kHz · 24-bit · buffer 256 · total delay 9.4 ms</span>
+</div>
+<div style="display: flex; align-items: center; gap: 20px">
+<span class="mono">CPU 2.1%</span>
+<span>No internet needed</span>
+<span class="mono">v1.0</span>
+</div>
+</footer>
+</main>
+</div>
+<div style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: rgba(5,6,8,0.7); display: flex; align-items: center; justify-content: center">
+<div role="alertdialog" aria-labelledby="dlg-h" aria-describedby="dlg-d" style="width: 600px; display: flex; flex-direction: column; gap: 22px; padding: 28px; box-sizing: border-box; border-radius: 18px; background: #1A1C20; border: 1px solid #33373E; box-shadow: 0 32px 80px rgba(0,0,0,0.6)">
+<div style="display: flex; gap: 18px">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: #2A2111; display: flex; align-items: center; justify-content: center; flex-shrink: 0">
+<svg width="24" height="24" sc-camel-view-box="0 0 24 24" fill="none" stroke="#FFC869" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="dlg-h" style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.01em">Another app has locked your microphone</h2>
+<p id="dlg-d" style="margin: 0; font-size: 14px; line-height: 1.55; color: #B9BBC1">Discord took exclusive control of USB Microphone, so Aurel can’t hear it. Your apps hear silence until this is fixed.</p>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: 12px; background: #141619; border: 1px solid #26292E">
+<span style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">What Aurel will change</span>
+<div style="display: flex; gap: 12px; font-size: 13px; line-height: 1.5; color: #F3F2EF"><span class="mono" style="width: 22px; height: 22px; border-radius: 50%; background: #23262B; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">1</span>In Windows sound settings, open USB Microphone › Advanced.</div>
+<div style="display: flex; gap: 12px; font-size: 13px; line-height: 1.5; color: #F3F2EF"><span class="mono" style="width: 22px; height: 22px; border-radius: 50%; background: #23262B; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">2</span>Turn off “Allow applications to take exclusive control of this device”.</div>
+<div style="display: flex; gap: 12px; font-size: 13px; line-height: 1.5; color: #F3F2EF"><span class="mono" style="width: 22px; height: 22px; border-radius: 50%; background: #23262B; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">3</span>Reconnect to the mic. Discord keeps working, through Aurel.</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<button style="height: 40px; padding: 0 4px; border: 0; background: transparent; font-size: 13px; font-weight: 500; color: #F5A623">I’ll do it myself</button>
+<div style="display: flex; gap: 10px">
+<button style="height: 40px; padding: 0 16px; border-radius: 10px; background: #17191C; border: 1px solid #33373E; font-size: 13px; font-weight: 500">Try again</button>
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 18px; border-radius: 10px; background: #F5A623; border: 0; color: #1B1204; font-size: 13px; font-weight: 600">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3z"></path></svg>Fix it for me</button>
+</div>
+</div>
+<span style="font-size: 12px; color: #8C9098">Windows will ask for administrator permission once.</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { profile: 'broadcast', on: true, view: 'enhanced', boost: 68, warmth: 62, presence: 48, noise: 'balanced', monitor: false };
+  }
+  renderVals() {
+    const s = this.state;
+    const fr = (x) => x - Math.floor(x);
+    const sgn = (v, d) => (v < 0 ? '−' : '+') + Math.abs(v).toFixed(d);
+    const g = s.boost / 68;
+    let inD = '';
+    let outD = '';
+    for (let i = 0; i < 140; i++) {
+      const x = 4 + i * 8;
+      const r = fr(Math.sin(i * 12.9898) * 43758.5453);
+      const syl = Math.abs(Math.sin(i * 0.31));
+      const phrase = Math.max(0, Math.sin(i * 0.058 + 0.5));
+      const e = syl * phrase;
+      const hin = 1.5 + 20 * e * (0.55 + 0.45 * r);
+      let hout = hin;
+      if (s.on) {
+        hout = e > 0.07 ? Math.min(98, 6 + 88 * Math.pow(e * (0.75 + 0.25 * r), 0.5) * g) : 1.2;
+      }
+      inD += 'M' + x + ' ' + (110 - hin).toFixed(1) + 'V' + (110 + hin).toFixed(1);
+      outD += 'M' + x + ' ' + (110 - hout).toFixed(1) + 'V' + (110 + hout).toFixed(1);
+    }
+    const gain = s.on ? s.boost * 0.38 : 0;
+    const outL = -41.8 + gain;
+    const meter = (v) => Math.max(4, Math.min(324, (60 + v) / 60 * 324));
+    const W = 466;
+    const slider = (v) => ({ w: W * v / 100, x: Math.max(9, Math.min(W - 9, W * v / 100)) });
+    const b = slider(s.boost), wa = slider(s.warmth), pr = slider(s.presence);
+    const noiseMap = { off: ['Off', 'Your room is passed through untouched.', '−48 dB'], light: ['Light', 'Takes the edge off steady hum and hiss. Most natural.', '−62 dB'], balanced: ['Balanced', 'Removes fans, keyboard clicks and room echo while keeping breaths natural.', '−74 dB'], strong: ['Strong', 'For loud rooms. Silences everything that is not your voice.', '−86 dB'] };
+    const profiles = [
+      { id: 'broadcast', name: 'Broadcast', desc: 'Deep, close and controlled. The late-night radio voice.', tags: 'Warm lows · Tight dynamics', curve: 'M0 30 C18 30 28 11 58 12 S108 25 140 25 S198 17 228 19 S254 27 260 29' },
+      { id: 'podcast', name: 'Podcast', desc: 'Rich and even for long-form talk, interviews and narration.', tags: 'Full body · Smooth', curve: 'M0 33 C25 33 40 17 72 17 S120 23 150 22 S210 16 240 18 S258 25 260 27' },
+      { id: 'clear', name: 'Clear Speech', desc: 'Crisp and intelligible. Tuned for meetings and calls.', tags: 'Low cut · Presence', curve: 'M0 39 C20 39 34 27 60 25 S120 23 150 21 S190 9 215 11 S250 21 260 25' },
+      { id: 'condenser', name: 'Studio Condenser', desc: 'Open, airy detail with a polished top end.', tags: 'Air · Detail', curve: 'M0 34 C30 34 50 24 90 24 S150 25 180 21 S230 8 260 7' },
+      { id: 'natural', name: 'Natural', desc: 'Light cleanup only. Still you, just clearer and louder.', tags: 'Transparent', curve: 'M0 29 C30 26 60 24 130 24 S230 24 260 25' }
+    ].map((p) => ({ ...p, selected: s.profile === p.id, stroke: s.profile === p.id ? '#F5A623' : '#8C9098', pick: () => this.setState({ profile: p.id }) }));
+    const views = [['original', 'Original'], ['enhanced', 'Enhanced']].map(([id, label]) => ({ label, selected: s.view === id, unselected: s.view !== id, pick: () => this.setState({ view: id }) }));
+    const noiseOpts = ['off', 'light', 'balanced', 'strong'].map((id) => ({ label: noiseMap[id][0], selected: s.noise === id, unselected: s.noise !== id, pick: () => this.setState({ noise: id }) }));
+    const nz = s.on ? noiseMap[s.noise] : noiseMap.off;
+    const inTarget = s.on && outL > -18.5 && outL < -13.5;
+    return {
+      inD, outD,
+      outOpacity: s.view === 'enhanced' ? 1 : 0.14,
+      inStroke: s.view === 'enhanced' ? '#9EA1A8' : '#F3F2EF',
+      on: s.on, off: !s.on,
+      togglePower: () => this.setState({ on: !s.on }),
+      monitor: s.monitor,
+      monitorLabel: s.monitor ? 'Monitoring' : 'Monitor off',
+      toggleMonitor: () => this.setState({ monitor: !s.monitor }),
+      liveCaption: s.on ? 'Listening through the ' + profiles.find((p) => p.selected).name + ' profile' : 'Enhancement bypassed',
+      outLabel: sgn(outL, 1).replace('+', ''),
+      statusText: !s.on ? 'Raw mic level. Most listeners will struggle to hear you.' : inTarget ? 'On target for podcasts and broadcast (−16)' : (outL <= -18.5 ? 'A little quiet. Raise Voice Boost.' : 'Hot. Lower Voice Boost to avoid pumping.'),
+      statusColor: !s.on ? '#FF8A7E' : inTarget ? '#43D18A' : '#FFC869',
+      inW: meter(-41.8), outW: meter(outL),
+      liftLabel: sgn(gain, 0) + ' dB',
+      floorLabel: nz[2],
+      profiles, views, noiseOpts,
+      noiseHelp: noiseMap[s.noise][1],
+      boost: s.boost, boostW: b.w, boostX: b.x, boostLabel: sgn(s.boost * 0.38, 0) + ' dB',
+      onBoost: (e) => this.setState({ boost: Number(e.target.value) }),
+      warmth: s.warmth, warmthW: wa.w, warmthX: wa.x, warmthLabel: sgn((s.warmth - 50) * 0.12, 1) + ' dB',
+      onWarmth: (e) => this.setState({ warmth: Number(e.target.value) }),
+      presence: s.presence, presenceW: pr.w, presenceX: pr.x, presenceLabel: sgn((s.presence - 50) * 0.12, 1) + ' dB',
+      onPresence: (e) => this.setState({ presence: Number(e.target.value) })
+    };
+  }
+}
+</script>
+
+
+</body></html>

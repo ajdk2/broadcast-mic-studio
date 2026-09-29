@@ -1,0 +1,147 @@
+<main style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 30px 40px 28px; box-sizing: border-box; min-height: 0">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 60px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.02em">Settings</h1>
+<span style="font-size: 14px; color: #8C9098">Changes save automatically.</span>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<div style="display: flex; flex-direction: column; gap: 24px">
+<section aria-labelledby="gen-h" style="display: flex; flex-direction: column; padding: 20px 24px 8px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<h2 id="gen-h" style="margin: 0 0 8px; font-size: 15px; font-weight: 600">General</h2>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Start Aurel when Windows starts</span><span style="font-size: 12px; color: #8C9098">Your voice is enhanced before your first meeting</span></div>
+<button type="button" role="switch" aria-checked="true" aria-label="Start with Windows" style="width: 40px; height: 24px; border-radius: 12px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1B1204"></span></button>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Start in the system tray</span><span style="font-size: 12px; color: #8C9098">Opens quietly without showing this window</span></div>
+<button type="button" role="switch" aria-checked="true" aria-label="Start in tray" style="width: 40px; height: 24px; border-radius: 12px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1B1204"></span></button>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">When I close the window</span><span style="font-size: 12px; color: #8C9098">Apps using Aurel Microphone keep working</span></div>
+<button style="height: 36px; min-width: 220px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-radius: 8px; background: #1F2227; border: 1px solid #33373E; font-size: 13px">Keep running in the tray<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Alert me if my mic disconnects</span><span style="font-size: 12px; color: #8C9098">A Windows notification, so you’re never silent by surprise</span></div>
+<button type="button" role="switch" aria-checked="true" aria-label="Disconnect alerts" style="width: 40px; height: 24px; border-radius: 12px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1B1204"></span></button>
+</div>
+</section>
+
+<section aria-labelledby="eng-h" style="display: flex; flex-direction: column; padding: 20px 24px 8px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<h2 id="eng-h" style="margin: 0 0 8px; font-size: 15px; font-weight: 600">Audio engine</h2>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<span style="font-size: 14px">Microphone</span>
+<button style="height: 36px; min-width: 260px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-radius: 8px; background: #1F2227; border: 1px solid #33373E; font-size: 13px">USB Microphone<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<span style="font-size: 14px">Monitor through</span>
+<button style="height: 36px; min-width: 260px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-radius: 8px; background: #1F2227; border: 1px solid #33373E; font-size: 13px">Headphones (Realtek Audio)<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<span style="font-size: 14px">Sample rate</span>
+<div role="group" aria-label="Sample rate" style="display: flex; gap: 2px; padding: 3px; background: #111215; border: 1px solid #26292E; border-radius: 8px">
+<button aria-pressed="false" class="mono" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">44.1 kHz</button>
+<button aria-pressed="true" class="mono" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: #2B2E34; color: #F3F2EF; font-size: 12px; font-weight: 500">48 kHz</button>
+<button aria-pressed="false" class="mono" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">96 kHz</button>
+</div>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Latency</span><span style="font-size: 12px; color: #8C9098">Lower is snappier; raise it if you hear crackles</span></div>
+<button class="mono" style="height: 36px; min-width: 260px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-radius: 8px; background: #1F2227; border: 1px solid #33373E; font-size: 13px">256 samples · 5.3 ms buffer<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+</div>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Processing quality</span><span style="font-size: 12px; color: #8C9098">Best uses more CPU for cleaner noise removal</span></div>
+<div role="group" aria-label="Processing quality" style="display: flex; gap: 2px; padding: 3px; background: #111215; border: 1px solid #26292E; border-radius: 8px">
+<button aria-pressed="false" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">Light on CPU</button>
+<button aria-pressed="true" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: #2B2E34; color: #F3F2EF; font-size: 12px; font-weight: 500">Balanced</button>
+<button aria-pressed="false" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">Best</button>
+</div>
+</div>
+</section>
+<section aria-labelledby="app-h" style="display: flex; flex-direction: column; padding: 20px 24px 8px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<h2 id="app-h" style="margin: 0 0 8px; font-size: 15px; font-weight: 600">Appearance</h2>
+<div style="min-height: 60px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A">
+<span style="font-size: 14px">Theme</span>
+<div role="group" aria-label="Theme" style="display: flex; gap: 2px; padding: 3px; background: #111215; border: 1px solid #26292E; border-radius: 8px">
+<button aria-pressed="true" style="height: 30px; padding: 0 14px; border: 0; border-radius: 6px; background: #2B2E34; color: #F3F2EF; font-size: 12px; font-weight: 500">Dark</button>
+<button aria-pressed="false" style="height: 30px; padding: 0 14px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">Light</button>
+<button aria-pressed="false" style="height: 30px; padding: 0 14px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">Match Windows</button>
+</div>
+</div>
+<div style="min-height: 52px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A; font-size: 13px; color: #8C9098">
+<span>Aurel 1.0 · Engine 1.0.0</span>
+<a href="#" style="font-size: 13px">Open-source licenses</a>
+</div>
+</section>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 24px">
+<section aria-labelledby="key-h" style="display: flex; flex-direction: column; padding: 20px 24px 8px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px"><h2 id="key-h" style="margin: 0; font-size: 15px; font-weight: 600">Keyboard shortcuts</h2><span style="font-size: 12px; color: #8C9098">Work in any app, even full screen</span></div>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A"><span style="font-size: 14px">Mute my mic</span><span style="display: flex; gap: 4px"><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Ctrl</kbd><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Alt</kbd><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">M</kbd></span></div>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A"><span style="font-size: 14px">Hear original (hold)</span><span style="display: flex; gap: 4px"><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Ctrl</kbd><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Alt</kbd><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">B</kbd></span></div>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A"><span style="font-size: 14px">Next profile</span><span style="display: flex; gap: 4px"><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Ctrl</kbd><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Alt</kbd><kbd class="mono" style="min-width: 28px; height: 28px; padding: 0 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">P</kbd></span></div>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A"><span style="font-size: 14px">Push to talk</span><button style="height: 32px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px dashed #3A3E46; font-size: 12px; color: #B9BBC1">Set shortcut</button></div>
+</section>
+
+<section aria-labelledby="priv-h" style="display: flex; flex-direction: column; gap: 16px; padding: 22px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: #16301F; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6BE3A4" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3z"></path><path d="m9 12 2 2 4-4" stroke-linecap="round"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 id="priv-h" style="margin: 0; font-size: 15px; font-weight: 600">Private and fully offline</h2><span style="font-size: 12px; color: #8C9098">Nothing about your voice ever leaves this PC</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; font-size: 13px; color: #B9BBC1">
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6BE3A4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>No account or sign-in</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6BE3A4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>All processing on this PC</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6BE3A4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>No recordings kept</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="#6BE3A4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>No usage tracking</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Updates</span><span style="font-size: 12px; color: #8C9098">Aurel never checks online. Install a new version from a file.</span></div>
+<button style="height: 36px; padding: 0 14px; border-radius: 8px; background: #1F2227; border: 1px solid #33373E; font-size: 13px; font-weight: 500">Install update from file…</button>
+</div>
+</section>
+<section aria-labelledby="ai-h" style="display: flex; flex-direction: column; gap: 14px; padding: 22px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: #2A2111; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="none" stroke="#FFC869" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><h2 id="ai-h" style="margin: 0; font-size: 15px; font-weight: 600">AI Studio mode</h2><span style="font-size: 12px; color: #8C9098">Rebuilds detail a budget mic can’t capture</span></div>
+</div>
+<span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #16301F; color: #6BE3A4">Runs offline</span>
+</div>
+<div style="min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #22252A">
+<span style="font-size: 14px">Use it for</span>
+<div role="group" aria-label="AI Studio mode" style="display: flex; gap: 2px; padding: 3px; background: #111215; border: 1px solid #26292E; border-radius: 8px">
+<button aria-pressed="false" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">Off</button>
+<button aria-pressed="true" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: #2B2E34; color: #F3F2EF; font-size: 12px; font-weight: 500">Recordings only</button>
+<button aria-pressed="false" style="height: 30px; padding: 0 12px; border: 0; border-radius: 6px; background: transparent; color: #B9BBC1; font-size: 12px">Calls too</button>
+</div>
+</div>
+<div style="min-height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid #22252A">
+<div style="display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px">Voice model</span><span class="mono" style="font-size: 12px; color: #8C9098">Installed · [SIZE] MB · uses your graphics card</span></div>
+<button style="height: 32px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px solid #33373E; font-size: 12px; font-weight: 500">Remove model</button>
+</div>
+<span style="font-size: 12px; line-height: 1.5; color: #8C9098">On calls it adds a small delay, so “Recordings only” is best for most people. Your voice is processed on this PC and never uploaded.</span>
+</section>
+
+
+</div>
+
+</div>
+</div>
+
+<footer style="height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-top: 1px solid #1C1E22; background: #0F1012; font-size: 12px; color: #8C9098">
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="display: flex; align-items: center; gap: 6px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #43D18A"></span>Audio engine running</span>
+<span class="mono">48 kHz · 24-bit · buffer 256 · total delay 9.4 ms</span>
+</div>
+<div style="display: flex; align-items: center; gap: 20px">
+<span class="mono">CPU 2.1%</span>
+<span>No internet needed</span>
+<span class="mono">v1.0</span>
+</div>
+</footer>
+</main>

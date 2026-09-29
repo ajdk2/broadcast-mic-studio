@@ -1,0 +1,49 @@
+<div role="dialog" aria-modal="true" aria-labelledby="tr-h" style="width: 840px; display: flex; flex-direction: column; gap: 24px; padding: 30px 32px; box-sizing: border-box; border-radius: 20px; background: #1A1C20; border: 1px solid #33373E; box-shadow: 0 32px 80px rgba(0,0,0,0.6)">
+<div style="display: flex; align-items: flex-start; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 id="tr-h" style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.015em">Test my sound</h2>
+<span style="font-size: 14px; line-height: 1.5; color: #B9BBC1">Record 10 seconds, then flip between original and enhanced. Much easier to judge than listening live.</span>
+</div>
+<a href="Main.dc.html" aria-label="Close" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: #B9BBC1; flex-shrink: 0"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 14px; background: #111215; border: 1px solid #24272C">
+<svg width="734" height="120" sc-camel-view-box="0 0 734 120" role="img" aria-label="{{twLabel}}">
+<line x1="0" y1="60" x2="734" y2="60" stroke="#23262B"></line>
+<path d="{{twDone}}" stroke="{{twColor}}" stroke-width="3.5" stroke-linecap="round"></path>
+<path d="{{twTodo}}" stroke="#3A3E46" stroke-width="3.5" stroke-linecap="round"></path>
+<line x1="295" y1="0" x2="295" y2="120" stroke="#F3F2EF" stroke-width="1.5"></line>
+</svg>
+<div class="mono" style="display: flex; justify-content: space-between; font-size: 11px; color: #8C9098"><span>0:00</span><span>0:04 / 0:10</span></div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 18px">
+<button sc-camel-on-click="{{togglePlay}}" aria-label="{{playLabel}}" style="width: 56px; height: 56px; border-radius: 50%; background: #F5A623; border: 0; color: #1B1204; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="20" height="20" sc-camel-view-box="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{playIcon}}"></path></svg></button>
+<div role="group" aria-label="What you hear" style="display: flex; gap: 2px; padding: 4px; background: #111215; border: 1px solid #26292E; border-radius: 12px">
+<sc-for list="{{abOpts}}" as="o" hint-placeholder-count="2">
+<sc-if value="{{o.selected}}" hint-placeholder-val="{{false}}"><button aria-pressed="true" sc-camel-on-click="{{o.pick}}" style="height: 40px; padding: 0 22px; border: 0; border-radius: 9px; background: #2B2E34; color: #F3F2EF; font-size: 14px; font-weight: 600">{{o.label}}</button></sc-if>
+<sc-if value="{{o.unselected}}" hint-placeholder-val="{{true}}"><button aria-pressed="false" sc-camel-on-click="{{o.pick}}" style="height: 40px; padding: 0 22px; border: 0; border-radius: 9px; background: transparent; color: #B9BBC1; font-size: 14px; font-weight: 500">{{o.label}}</button></sc-if>
+</sc-for>
+</div>
+<span style="font-size: 13px; color: #8C9098">Switch while it plays</span>
+<button type="button" role="switch" aria-checked="true" aria-label="Loop" style="margin-left: auto; height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 6px 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; cursor: pointer">Loop<span style="width: 36px; height: 22px; border-radius: 11px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box"><span style="width: 16px; height: 16px; border-radius: 50%; background: #1B1204"></span></span></button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 500">Hear it as</span>
+<div role="radiogroup" aria-label="Profile for this test" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{tprofs}}" as="t" hint-placeholder-count="5">
+<sc-if value="{{t.selected}}" hint-placeholder-val="{{false}}"><button role="radio" aria-checked="true" sc-camel-on-click="{{t.pick}}" style="height: 36px; padding: 0 14px; border-radius: 999px; background: #2A2111; border: 1px solid #F5A623; color: #FFC869; font-size: 13px; font-weight: 600">{{t.name}}</button></sc-if>
+<sc-if value="{{t.unselected}}" hint-placeholder-val="{{true}}"><button role="radio" aria-checked="false" sc-camel-on-click="{{t.pick}}" style="height: 36px; padding: 0 14px; border-radius: 999px; background: transparent; border: 1px solid #33373E; color: #B9BBC1; font-size: 13px; font-weight: 500">{{t.name}}</button></sc-if>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; padding-top: 18px; border-top: 1px solid #2A2D33">
+<span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8C9098"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3z"></path></svg>Stays on this PC. Deleted when you close this.</span>
+<div style="display: flex; gap: 10px">
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 10px; background: #17191C; border: 1px solid #33373E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="#FF6A5C"></circle></svg>Record again</button>
+<a href="Main.dc.html" style="height: 40px; display: flex; align-items: center; padding: 0 18px; border-radius: 10px; background: #F5A623; color: #1B1204; box-sizing: border-box; font-size: 13px; font-weight: 600">{{keepLabel}}</a>
+</div>
+</div>
+</div>

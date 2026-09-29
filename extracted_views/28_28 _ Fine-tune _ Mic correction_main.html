@@ -1,0 +1,153 @@
+<main style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 30px 40px 28px; box-sizing: border-box; min-height: 0">
+
+<div style="display: flex; align-items: center; justify-content: space-between; height: 60px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 12px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.02em">Fine-tune</h1>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: #22252A; color: #B9BBC1">Broadcast<span style="width: 6px; height: 6px; border-radius: 50%; background: #F5A623"></span>Edited</span>
+</div>
+<span style="font-size: 14px; color: #8C9098">Every stage of the voice chain, in the order Aurel processes it. Changes are heard instantly.</span>
+</div>
+<div style="display: flex; align-items: center; gap: 10px">
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: transparent; border: 0; border-radius: 10px; font-size: 13px; font-weight: 500; color: #B9BBC1">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>Reset to Broadcast</button>
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #17191C; border: 1px solid #33373E; border-radius: 10px; font-size: 13px; font-weight: 500">Update “Broadcast”</button>
+<a href="SaveProfile.dc.html" style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 18px; background: #F5A623; border-radius: 10px; box-sizing: border-box; font-size: 13px; font-weight: 600; color: #1B1204">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Save as new profile</a>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; gap: 24px; min-height: 0">
+
+<section aria-labelledby="chain-h" style="width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; padding: 20px 14px; box-sizing: border-box; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 0 8px 12px">
+<h2 id="chain-h" style="margin: 0; font-size: 15px; font-weight: 600">Voice chain</h2>
+<span style="font-size: 12px; color: #8C9098">Processed top to bottom</span>
+</div>
+<sc-for list="{{modules}}" as="m" hint-placeholder-count="12">
+<div class="mod" style="position: relative; height: 54px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 10px">
+<sc-if value="{{m.selected}}" hint-placeholder-val="{{false}}">
+<span style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 10px; background: #1F2227; border: 1px solid #3A3E46; pointer-events: none"></span>
+</sc-if>
+<button sc-camel-on-click="{{m.pick}}" aria-pressed="{{m.selected}}" style="position: relative; flex-grow: 1; align-self: stretch; display: flex; align-items: center; gap: 12px; padding: 0; border: 0; background: transparent; text-align: left">
+<span class="mono" style="position: relative; width: 24px; height: 24px; border-radius: 7px; background: #23262B; color: #B9BBC1; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">{{m.n}}</span>
+<span style="position: relative; flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 14px; font-weight: 500; color: #F3F2EF">{{m.name}}</span>
+<span class="mono" style="font-size: 11px; color: #8C9098">{{m.sum}}</span>
+</span>
+</button>
+<button type="button" role="switch" aria-checked="true" aria-label="{{m.switchLabel}}" style="position: relative; width: 40px; height: 24px; border-radius: 12px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: #1B1204"></span></button>
+</div>
+</sc-for>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding: 14px 8px 0; border-top: 1px solid #24272C">
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #8C9098">Chain latency</span><span class="mono" style="color: #B9BBC1">9.4 ms</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #8C9098">CPU</span><span class="mono" style="color: #B9BBC1">2.1%</span></div>
+</div>
+</section>
+
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; min-width: 0">
+<section aria-labelledby="mc-h" style="flex-grow: 1; display: flex; flex-direction: column; gap: 20px; padding: 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h2 id="mc-h" style="margin: 0; font-size: 17px; font-weight: 600">Mic correction</h2>
+<span style="max-width: 560px; font-size: 13px; line-height: 1.5; color: #8C9098">Every mic colors your voice. Aurel evens out yours first, so every profile sounds the way it should on any mic.</span>
+</div>
+<div style="display: flex; gap: 10px; flex-shrink: 0">
+<button style="height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-radius: 8px; background: #1F2227; border: 1px solid #33373E; font-size: 13px">Measured from voice check<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+<a href="Setup.dc.html" style="height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 8px; border: 1px solid #33373E; box-sizing: border-box; font-size: 13px; font-weight: 500; color: #F3F2EF"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>Measure again</a>
+</div>
+</div>
+<div style="display: flex; gap: 20px; font-size: 12px; color: #B9BBC1">
+<span style="display: flex; align-items: center; gap: 8px"><span style="width: 14px; height: 3px; border-radius: 2px; background: #9EA1A8"></span>Your mic, as heard</span>
+<span style="display: flex; align-items: center; gap: 8px"><svg width="14" height="4" aria-hidden="true"><path d="M0 2h4M7 2h4" stroke="#F5A623" stroke-width="2.5"></path></svg>Correction</span>
+<span style="display: flex; align-items: center; gap: 8px"><span style="width: 14px; height: 3px; border-radius: 2px; background: #F3F2EF"></span>Result, before your profile</span>
+</div>
+<div style="position: relative; width: 836px; height: 300px">
+<svg width="836" height="300" sc-camel-view-box="0 0 836 300" role="img" aria-label="Mic correction curves: measured mic response, correction, and the evened-out result">
+<line x1="110.9" y1="0" x2="110.9" y2="278" stroke="#23262B"></line><line x1="194.8" y1="0" x2="194.8" y2="278" stroke="#23262B"></line><line x1="278.7" y1="0" x2="278.7" y2="278" stroke="#23262B"></line><line x1="389.6" y1="0" x2="389.6" y2="278" stroke="#23262B"></line><line x1="473.4" y1="0" x2="473.4" y2="278" stroke="#23262B"></line><line x1="557.3" y1="0" x2="557.3" y2="278" stroke="#23262B"></line><line x1="668.2" y1="0" x2="668.2" y2="278" stroke="#23262B"></line><line x1="752.1" y1="0" x2="752.1" y2="278" stroke="#23262B"></line>
+<line x1="0" y1="59" x2="836" y2="59" stroke="#23262B"></line><line x1="0" y1="139" x2="836" y2="139" stroke="#3A3E46"></line><line x1="0" y1="219" x2="836" y2="219" stroke="#23262B"></line>
+<path d="{{micD}}" fill="none" stroke="#9EA1A8" stroke-width="2.5"></path>
+<path d="{{corrD}}" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-dasharray="6 5"></path>
+<path d="{{resD}}" fill="none" stroke="#F3F2EF" stroke-width="3"></path>
+<text x="110.9" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">50</text><text x="194.8" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">100</text><text x="278.7" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">200</text><text x="389.6" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">500</text><text x="473.4" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">1k</text><text x="557.3" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">2k</text><text x="668.2" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">5k</text><text x="752.1" y="296" fill="#8C9098" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">10k</text>
+</svg>
+<div class="mono" style="position: absolute; left: 8px; top: 51px; display: flex; flex-direction: column; gap: 64px; font-size: 10px; color: #8C9098; line-height: 16px"><span>+6</span><span>0 dB</span><span>−6</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E"><span class="mono" style="font-size: 17px; font-weight: 500">+3.2 dB</span><span style="font-size: 13px; font-weight: 500">Body · 100–250 Hz</span><span style="font-size: 12px; color: #8C9098">Your mic sounds thin down low</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E"><span class="mono" style="font-size: 17px; font-weight: 500">−2.0 dB</span><span style="font-size: 13px; font-weight: 500">Boxiness · 500–800 Hz</span><span style="font-size: 12px; color: #8C9098">The “talking into a cup” tone</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E"><span class="mono" style="font-size: 17px; font-weight: 500">−2.4 dB</span><span style="font-size: 13px; font-weight: 500">Harshness · 3–5 kHz</span><span style="font-size: 12px; color: #8C9098">Edgy peak common in budget mics</span></div>
+</div>
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="font-size: 13px; width: 70px">Strength</span>
+<div style="position: relative; width: 640px; height: 24px">
+<svg width="640" height="24" sc-camel-view-box="0 0 640 24" aria-hidden="true"><rect y="10" width="640" height="4" rx="2" fill="#666A73"></rect><rect y="10" width="512" height="4" rx="2" fill="#F5A623"></rect><circle cx="512" cy="12" r="9" fill="#F3F2EF"></circle></svg>
+<input class="range" type="range" min="0" max="100" value="80" aria-label="Mic correction strength">
+</div>
+<span class="mono" style="font-size: 13px; color: #B9BBC1">80%</span>
+</div>
+<p style="margin: 0; margin-top: auto; display: flex; gap: 8px; font-size: 12px; line-height: 1.5; color: #8C9098"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg>Estimated from your voice, not a lab measurement. A longer voice check gives a more accurate result.</p>
+</section>
+</div>
+<div style="width: 360px; flex-shrink: 0; display: flex; flex-direction: column; gap: 24px">
+<section aria-labelledby="comp-h" style="display: flex; flex-direction: column; gap: 14px; padding: 22px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 id="comp-h" style="margin: 0; font-size: 17px; font-weight: 600">Compressor</h2><span style="font-size: 12px; color: #8C9098">Evens out loud and soft words</span></div>
+<svg width="312" height="200" sc-camel-view-box="0 0 312 200" role="img" aria-label="Compressor transfer curve, threshold minus 24 dB, ratio 3 to 1">
+<rect width="312" height="200" rx="8" fill="#1B1D21"></rect>
+<line x1="104" y1="0" x2="104" y2="200" stroke="#26292E"></line><line x1="208" y1="0" x2="208" y2="200" stroke="#26292E"></line>
+<line x1="0" y1="66.7" x2="312" y2="66.7" stroke="#26292E"></line><line x1="0" y1="133.3" x2="312" y2="133.3" stroke="#26292E"></line>
+<line x1="0" y1="200" x2="312" y2="0" stroke="#3A3E46" stroke-dasharray="3 4"></line>
+<line x1="187.2" y1="0" x2="187.2" y2="200" stroke="#F5A623" stroke-dasharray="3 4" opacity="0.5"></line>
+<path d="M0 200 L175 88 Q187.2 80 200 76 L312 53.3" fill="none" stroke="#F5A623" stroke-width="2.5" stroke-linecap="round"></path>
+<circle cx="239" cy="65" r="5" fill="#F3F2EF"></circle>
+<text x="192" y="16" fill="#FFC869" font-size="10" font-family="Geist Mono, monospace">−24 dB</text>
+</svg>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 12px"><span style="color: #8C9098">Gain reduction</span><span class="mono" style="color: #F3F2EF">−4.2 dB</span></div>
+<svg width="312" height="6" sc-camel-view-box="0 0 312 6" aria-hidden="true"><rect width="312" height="6" rx="3" fill="#23262B"></rect><rect x="232" width="80" height="6" rx="3" fill="#5CC8DF"></rect></svg>
+</div>
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{comp}}" as="c" hint-placeholder-count="5">
+<div style="height: 36px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #22252A"><span style="font-size: 13px; color: #B9BBC1">{{c.k}}</span><span class="mono" style="font-size: 13px; color: #F3F2EF">{{c.v}}</span></div>
+</sc-for>
+</div>
+</section>
+<section aria-labelledby="ds-h" style="display: flex; flex-direction: column; gap: 12px; padding: 18px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 id="ds-h" style="margin: 0; font-size: 15px; font-weight: 600">De-esser</h2><span class="mono" style="font-size: 13px; color: #B9BBC1">6.5 kHz · −4 dB</span></div>
+<div style="position: relative; width: 312px; height: 24px">
+<svg width="312" height="24" sc-camel-view-box="0 0 312 24" aria-hidden="true"><rect y="10" width="312" height="4" rx="2" fill="#666A73"></rect><rect y="10" width="125" height="4" rx="2" fill="#F5A623"></rect><circle cx="125" cy="12" r="9" fill="#F3F2EF"></circle></svg>
+<input class="range" type="range" min="0" max="100" value="40" aria-label="De-esser amount">
+</div>
+</section>
+<section aria-labelledby="aw-h" style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; padding: 18px 24px; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 id="aw-h" style="margin: 0; font-size: 15px; font-weight: 600">Analog warmth</h2><span class="mono" style="font-size: 13px; color: #B9BBC1">Tape · 18%</span></div>
+<span style="font-size: 12px; line-height: 1.5; color: #8C9098">Subtle saturation, like a studio preamp. Adds richness, never distortion.</span>
+<div role="group" aria-label="Warmth character" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 3px; background: #111215; border: 1px solid #26292E; border-radius: 10px">
+<button aria-pressed="true" style="height: 30px; border: 0; border-radius: 7px; background: #2B2E34; color: #F3F2EF; font-size: 12px; font-weight: 500">Tape</button>
+<button aria-pressed="false" style="height: 30px; border: 0; border-radius: 7px; background: transparent; color: #B9BBC1; font-size: 12px">Tube</button>
+<button aria-pressed="false" style="height: 30px; border: 0; border-radius: 7px; background: transparent; color: #B9BBC1; font-size: 12px">Console</button>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 13px"><span>Drive</span><span class="mono" style="color: #B9BBC1">18%</span></div>
+<div style="position: relative; width: 312px; height: 24px">
+<svg width="312" height="24" sc-camel-view-box="0 0 312 24" aria-hidden="true"><rect y="10" width="312" height="4" rx="2" fill="#666A73"></rect><rect y="10" width="56" height="4" rx="2" fill="#F5A623"></rect><circle cx="56" cy="12" r="9" fill="#F3F2EF"></circle></svg>
+<input class="range" type="range" min="0" max="100" value="18" aria-label="Warmth drive">
+</div>
+</section>
+</div>
+
+</div>
+</div>
+
+<footer style="height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-top: 1px solid #1C1E22; background: #0F1012; font-size: 12px; color: #8C9098">
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="display: flex; align-items: center; gap: 6px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #43D18A"></span>Audio engine running</span>
+<span class="mono">48 kHz · 24-bit · buffer 256 · total delay 9.4 ms</span>
+</div>
+<div style="display: flex; align-items: center; gap: 20px">
+<span class="mono">CPU 2.1%</span>
+<span>No internet needed</span>
+<span class="mono">v1.0</span>
+</div>
+</footer>
+</main>

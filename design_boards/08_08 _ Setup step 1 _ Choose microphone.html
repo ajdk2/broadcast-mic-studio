@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Aurel — Setup, choose microphone</title>
+<script src="236e9d28-871b-4481-94a0-704568b565ee"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("9b9803b2-9858-48c6-92d0-05d6c7143583") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("e03b1eb7-e1ec-465c-b091-190721a5270c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("0c804778-c9c0-461d-bf01-2b8a1eba2d33") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fec48e39-353f-4b14-bfa2-dc681165bbd1") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("1f0bb05c-f4a9-4bb2-a134-0c0dae90ab16") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("9b9803b2-9858-48c6-92d0-05d6c7143583") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("e03b1eb7-e1ec-465c-b091-190721a5270c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("0c804778-c9c0-461d-bf01-2b8a1eba2d33") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fec48e39-353f-4b14-bfa2-dc681165bbd1") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("1f0bb05c-f4a9-4bb2-a134-0c0dae90ab16") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("9b9803b2-9858-48c6-92d0-05d6c7143583") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("e03b1eb7-e1ec-465c-b091-190721a5270c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("0c804778-c9c0-461d-bf01-2b8a1eba2d33") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fec48e39-353f-4b14-bfa2-dc681165bbd1") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("1f0bb05c-f4a9-4bb2-a134-0c0dae90ab16") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("9b9803b2-9858-48c6-92d0-05d6c7143583") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("e03b1eb7-e1ec-465c-b091-190721a5270c") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("0c804778-c9c0-461d-bf01-2b8a1eba2d33") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fec48e39-353f-4b14-bfa2-dc681165bbd1") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("1f0bb05c-f4a9-4bb2-a134-0c0dae90ab16") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("ca3a765f-98af-4538-8f0b-995ee522edf4") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("18a71caf-d834-4d6b-95a3-1c704640a9a4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("367e37f6-8e44-4056-b606-cc48dfd7b41f") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("b0ef1c9d-7e67-4bc6-8fee-a995a9161370") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("247b8758-e9ae-4273-8c18-83fbf0387fce") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("68d782bc-83b2-4659-8e94-7fb849335a44") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("ca3a765f-98af-4538-8f0b-995ee522edf4") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("18a71caf-d834-4d6b-95a3-1c704640a9a4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("367e37f6-8e44-4056-b606-cc48dfd7b41f") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("b0ef1c9d-7e67-4bc6-8fee-a995a9161370") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("247b8758-e9ae-4273-8c18-83fbf0387fce") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("68d782bc-83b2-4659-8e94-7fb849335a44") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("ca3a765f-98af-4538-8f0b-995ee522edf4") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("18a71caf-d834-4d6b-95a3-1c704640a9a4") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("367e37f6-8e44-4056-b606-cc48dfd7b41f") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("b0ef1c9d-7e67-4bc6-8fee-a995a9161370") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("247b8758-e9ae-4273-8c18-83fbf0387fce") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("68d782bc-83b2-4659-8e94-7fb849335a44") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+body{margin:0;background:#0D0E10;color:#F3F2EF;font-family:'Geist','Segoe UI Variable Text','Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#F5A623;text-decoration:none}a:hover{color:#FFC061}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid #F5A623;outline-offset:2px}
+.mono{font-family:'Geist Mono','Cascadia Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; display: flex; flex-direction: column; background: #0D0E10; overflow: hidden">
+
+<header style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding-left: 16px; border-bottom: 1px solid #1C1E22">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="16" height="16" sc-camel-view-box="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#F5A623"></rect><path d="M8 14v0M11 10.5v7M14 7.5v13M17 10.5v7M20 13.5v1" stroke="#1B1204" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span style="font-size: 12px; color: #B9BBC1">Aurel Voice Studio — Setup</span>
+</div>
+<div style="display: flex">
+<button aria-label="Minimize" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><path d="M0 5.5h10" stroke="currentColor"></path></svg></button>
+<button aria-label="Maximize" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor"></rect></svg></button>
+<button aria-label="Close" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><path d="M0.5 0.5l9 9M9.5 0.5l-9 9" stroke="currentColor"></path></svg></button>
+</div>
+</header>
+
+<div style="flex-grow: 1; display: flex; min-height: 0">
+
+<aside style="width: 400px; flex-shrink: 0; background: #111215; border-right: 1px solid #1C1E22; display: flex; flex-direction: column; gap: 48px; padding: 48px 40px 36px; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<svg width="44" height="44" sc-camel-view-box="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#F5A623"></rect><path d="M8 14v0M11 10.5v7M14 7.5v13M17 10.5v7M20 13.5v1" stroke="#1B1204" stroke-width="2.2" stroke-linecap="round"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em">Set up Aurel</span>
+<span style="font-size: 14px; line-height: 1.5; color: #B9BBC1">Four quick steps to a broadcast-quality voice. About two minutes.</span>
+</div>
+</div>
+
+<ol aria-label="Setup steps" style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
+<li aria-current="step" style="display: flex; gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center">
+<span class="mono" style="width: 28px; height: 28px; border-radius: 50%; background: #F5A623; color: #1B1204; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">1</span>
+<span style="width: 2px; flex-grow: 1; min-height: 34px; background: #26292E"></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 4px; padding-bottom: 22px">
+<span style="font-size: 14px; font-weight: 600; color: #F3F2EF">Microphone</span>
+<span style="font-size: 13px; color: #B9BBC1">Pick the mic you speak into</span>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center">
+<span class="mono" style="width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #3A3E46; box-sizing: border-box; color: #8C9098; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">2</span>
+<span style="width: 2px; flex-grow: 1; min-height: 34px; background: #26292E"></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 4px; padding-bottom: 22px">
+<span style="font-size: 14px; font-weight: 600; color: #8C9098">Voice check</span>
+<span style="font-size: 13px; color: #8C9098">Measure how loudly you speak</span>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center">
+<span class="mono" style="width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #3A3E46; box-sizing: border-box; color: #8C9098; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">3</span>
+<span style="width: 2px; flex-grow: 1; min-height: 34px; background: #26292E"></span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 4px; padding-bottom: 22px">
+<span style="font-size: 14px; font-weight: 600; color: #8C9098">Choose your sound</span>
+<span style="font-size: 13px; color: #8C9098">Broadcast, podcast, or clear speech</span>
+</div>
+</li>
+<li style="display: flex; gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center">
+<span class="mono" style="width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #3A3E46; box-sizing: border-box; color: #8C9098; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0">4</span>
+
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 4px; ">
+<span style="font-size: 14px; font-weight: 600; color: #8C9098">Connect your apps</span>
+<span style="font-size: 13px; color: #8C9098">Zoom, Teams, Discord, OBS and more</span>
+</div>
+</li>
+</ol>
+
+<div style="margin-top: auto; display: flex; gap: 12px; padding: 16px; border-radius: 12px; background: #17191C; border: 1px solid #24272C">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="#B9BBC1" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3z"></path></svg>
+<span style="font-size: 13px; line-height: 1.5; color: #B9BBC1">Your voice never leaves this PC. Aurel works fully offline and keeps no recordings.</span>
+</div>
+</aside>
+
+<main style="flex-grow: 1; display: flex; flex-direction: column; gap: 32px; padding: 56px 80px 44px; box-sizing: border-box; min-width: 0"><div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #F5A623">Step 1 of 4</span>
+<h1 style="margin: 0; font-size: 38px; font-weight: 600; letter-spacing: -0.025em">Which microphone do you speak into?</h1>
+<p style="margin: 0; max-width: 860px; font-size: 16px; line-height: 1.55; color: #B9BBC1">We found three on this PC. Say a few words — the one that hears you best lights up.</p>
+</div>
+<div role="radiogroup" aria-label="Microphone" style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{mics}}" as="m" hint-placeholder-count="3">
+<button role="radio" aria-checked="{{m.selected}}" sc-camel-on-click="{{m.pick}}" style="position: relative; height: 96px; display: flex; align-items: center; gap: 20px; padding: 0 24px; box-sizing: border-box; border-radius: 16px; background: #16181B; border: 1px solid #24272C; text-align: left">
+<sc-if value="{{m.selected}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: -1px; top: -1px; right: -1px; bottom: -1px; border: 2px solid #F5A623; border-radius: 16px; pointer-events: none"></span></sc-if>
+<span style="width: 22px; height: 22px; border-radius: 50%; border: 2px solid {{m.ring}}; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><sc-if value="{{m.selected}}" hint-placeholder-val="{{false}}"><span style="width: 10px; height: 10px; border-radius: 50%; background: #F5A623"></span></sc-if></span>
+<span style="width: 48px; height: 48px; border-radius: 12px; background: #23262B; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="22" height="22" sc-camel-view-box="0 0 24 24" fill="none" stroke="#F3F2EF" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="{{m.icon}}"></path></svg></span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; align-items: center; gap: 10px"><span style="font-size: 16px; font-weight: 600; color: #F3F2EF">{{m.name}}</span><sc-if value="{{m.hasBadge}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: {{m.badgeBg}}; color: {{m.badgeFg}}">{{m.badge}}</span></sc-if></span>
+<span style="font-size: 13px; color: #8C9098">{{m.sub}}</span>
+</span>
+<span style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0">
+<svg width="240" height="14" sc-camel-view-box="0 0 240 14" aria-hidden="true"><path d="{{m.offD}}" fill="#23262B"></path><path d="{{m.onD}}" fill="{{m.meterColor}}"></path></svg>
+<span style="font-size: 12px; color: #8C9098">{{m.hear}}</span>
+</span>
+</button>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px">
+<section aria-labelledby="tip-h" style="display: flex; gap: 20px; padding: 24px; border-radius: 16px; background: #16181B; border: 1px solid #24272C">
+<svg width="120" height="120" sc-camel-view-box="0 0 120 120" aria-hidden="true" style="flex-shrink: 0"><rect width="120" height="120" rx="12" fill="#1B1D21"></rect><rect x="18" y="38" width="30" height="44" rx="15" fill="none" stroke="#9EA1A8" stroke-width="2"></rect><path d="M48 60h26" stroke="#F5A623" stroke-width="2" stroke-dasharray="3 4"></path><circle cx="92" cy="60" r="14" fill="none" stroke="#F3F2EF" stroke-width="2"></circle><path d="M86 66q6 4 12 0" stroke="#F3F2EF" stroke-width="2" fill="none" stroke-linecap="round"></path><text x="61" y="52" fill="#FFC869" font-size="11" text-anchor="middle" font-family="Geist Mono, monospace">5–15 cm</text></svg>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 id="tip-h" style="margin: 0; font-size: 15px; font-weight: 600">Get the most from any mic</h2>
+<p style="margin: 0; font-size: 13px; line-height: 1.6; color: #B9BBC1">Stay 5–15 cm from the mic and speak slightly past it, not straight into it, to avoid pops. Closer means more voice and less room. Aurel makes up the volume, so you never have to lean in.</p>
+</div>
+</section>
+<section aria-labelledby="vol-h" style="display: flex; flex-direction: column; justify-content: space-between; gap: 16px; padding: 24px; border-radius: 16px; background: #16181B; border: 1px solid #24272C">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px"><h2 id="vol-h" style="margin: 0; font-size: 15px; font-weight: 600">Let Aurel manage input volume</h2><span style="font-size: 13px; line-height: 1.55; color: #B9BBC1">Windows has this mic at 64%. Aurel sets it to 100% and does all the lifting cleanly after that.</span></div>
+<button type="button" role="switch" aria-checked="true" aria-label="Manage input volume" style="width: 44px; height: 26px; border-radius: 13px; background: #F5A623; display: flex; align-items: center; justify-content: flex-end; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 20px; height: 20px; border-radius: 50%; background: #1B1204"></span></button>
+</div>
+<div class="mono" style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #8C9098"><span>64%</span><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg><span style="color: #F3F2EF">100%</span></div>
+</section>
+</div>
+<div style="margin-top: auto; display: flex; align-items: center; justify-content: space-between">
+<a href="Main.dc.html" style="height: 44px; display: flex; align-items: center; padding: 0 4px; font-size: 14px; font-weight: 500; color: #B9BBC1">Skip setup</a>
+<div style="display: flex; gap: 12px">
+
+<a href="Setup.dc.html" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 24px; border-radius: 10px; background: #F5A623; color: #1B1204; font-size: 14px; font-weight: 600">Continue
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { mic: 'usb' }; }
+  renderVals() {
+    const seg = (lit) => { let on = '', off = ''; for (let i = 0; i < 24; i++) { const d = 'M' + (i * 10) + ' 0h7v14h-7z'; if (i < lit) on += d; else off += d; } return { onD: on, offD: off }; };
+    const MIC = 'M9 3h6v11H9zM5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7';
+    const LAP = 'M4 5h16v10H4zM2 19h20';
+    const HS = 'M4 14v-2a8 8 0 0 1 16 0v2M4 14h3v5H4zM17 14h3v5h-3zM20 19c0 1.5-2 2.5-5 2.5';
+    const M = [
+      { id: 'usb', name: 'USB Microphone', sub: 'USB · 48 kHz', icon: MIC, lit: 16, badge: 'Hears you best', badgeBg: '#16301F', badgeFg: '#6BE3A4', hear: 'Clear voice, quiet room' },
+      { id: 'laptop', name: 'Microphone Array', sub: 'Built into this laptop · Realtek', icon: LAP, lit: 7, badge: '', hear: 'Mostly room and fan noise' },
+      { id: 'headset', name: 'Headset Microphone', sub: 'Bluetooth · Hands-free mode', icon: HS, lit: 3, badge: 'Thin sound on calls', badgeBg: '#2A2111', badgeFg: '#FFC869', hear: 'Barely hears you' }
+    ];
+    const mics = M.map((m) => ({ ...m, ...seg(m.lit), hasBadge: !!m.badge, selected: this.state.mic === m.id, ring: this.state.mic === m.id ? '#F5A623' : '#5A5E66', meterColor: m.lit > 12 ? '#F3F2EF' : '#9EA1A8', pick: () => this.setState({ mic: m.id }) }));
+    return { mics };
+  }
+}
+</script>
+
+
+</body></html>

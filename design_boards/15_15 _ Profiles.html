@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>Aurel — Profiles</title>
+<script src="36bdd3c7-286d-45d5-9417-5829641bceb7"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("285cfc3c-b948-4a0f-baee-6d5ef22af291") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("890a97cd-becb-4d73-95f3-cd92ea75f59b") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("25367fbe-2c2c-484f-a319-d2402c3711a1") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("a87c9d1e-a9e9-4265-ae42-d95ba5e7d75a") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("6874bf2c-19a3-4c6f-8d01-9c29f0d1dd7d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("285cfc3c-b948-4a0f-baee-6d5ef22af291") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("890a97cd-becb-4d73-95f3-cd92ea75f59b") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("25367fbe-2c2c-484f-a319-d2402c3711a1") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("a87c9d1e-a9e9-4265-ae42-d95ba5e7d75a") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("6874bf2c-19a3-4c6f-8d01-9c29f0d1dd7d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("285cfc3c-b948-4a0f-baee-6d5ef22af291") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("890a97cd-becb-4d73-95f3-cd92ea75f59b") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("25367fbe-2c2c-484f-a319-d2402c3711a1") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("a87c9d1e-a9e9-4265-ae42-d95ba5e7d75a") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("6874bf2c-19a3-4c6f-8d01-9c29f0d1dd7d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("285cfc3c-b948-4a0f-baee-6d5ef22af291") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("890a97cd-becb-4d73-95f3-cd92ea75f59b") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("25367fbe-2c2c-484f-a319-d2402c3711a1") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("a87c9d1e-a9e9-4265-ae42-d95ba5e7d75a") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("6874bf2c-19a3-4c6f-8d01-9c29f0d1dd7d") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("5fd0f72d-4700-4c3e-a1cb-119713b07d62") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("43874b54-715a-46c2-bc8d-9ee36677abe8") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("47a64d2a-555b-4bf6-816c-8f252e8ff610") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("113976bc-d080-49e3-9f69-979d3f842e07") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("2475474a-80ca-4eeb-8adf-589ce5ba7eea") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("60e3717c-47ca-406d-8e65-f41a62121375") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("5fd0f72d-4700-4c3e-a1cb-119713b07d62") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("43874b54-715a-46c2-bc8d-9ee36677abe8") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("47a64d2a-555b-4bf6-816c-8f252e8ff610") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("113976bc-d080-49e3-9f69-979d3f842e07") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("2475474a-80ca-4eeb-8adf-589ce5ba7eea") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("60e3717c-47ca-406d-8e65-f41a62121375") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("5fd0f72d-4700-4c3e-a1cb-119713b07d62") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("43874b54-715a-46c2-bc8d-9ee36677abe8") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* symbols2 */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("47a64d2a-555b-4bf6-816c-8f252e8ff610") format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("113976bc-d080-49e3-9f69-979d3f842e07") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("2475474a-80ca-4eeb-8adf-589ce5ba7eea") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("60e3717c-47ca-406d-8e65-f41a62121375") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+body{margin:0;background:#0D0E10;color:#F3F2EF;font-family:'Geist','Segoe UI Variable Text','Segoe UI',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#F5A623;text-decoration:none}a:hover{color:#FFC061}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid #F5A623;outline-offset:2px}
+.mono{font-family:'Geist Mono','Cascadia Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.nav:hover{background:#1A1C20}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; display: flex; flex-direction: column; background: #0D0E10; overflow: hidden">
+
+<header style="height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding-left: 16px; border-bottom: 1px solid #1C1E22">
+<div style="display: flex; align-items: center; gap: 10px">
+<svg width="16" height="16" sc-camel-view-box="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#F5A623"></rect><path d="M8 14v0M11 10.5v7M14 7.5v13M17 10.5v7M20 13.5v1" stroke="#1B1204" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span style="font-size: 12px; color: #B9BBC1">Aurel Voice Studio</span>
+</div>
+<div style="display: flex">
+<button aria-label="Minimize" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><path d="M0 5.5h10" stroke="currentColor"></path></svg></button>
+<button aria-label="Maximize" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor"></rect></svg></button>
+<button aria-label="Close" style="width: 46px; height: 40px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #B9BBC1"><svg width="10" height="10" sc-camel-view-box="0 0 10 10"><path d="M0.5 0.5l9 9M9.5 0.5l-9 9" stroke="currentColor"></path></svg></button>
+</div>
+</header>
+
+<div style="flex-grow: 1; display: flex; min-height: 0">
+
+<nav aria-label="Primary" style="width: 248px; flex-shrink: 0; background: #111215; border-right: 1px solid #1C1E22; display: flex; flex-direction: column; gap: 28px; padding: 22px 14px 18px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 12px; padding: 0 8px">
+<svg width="32" height="32" sc-camel-view-box="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="8" fill="#F5A623"></rect><path d="M8 14v0M11 10.5v7M14 7.5v13M17 10.5v7M20 13.5v1" stroke="#1B1204" stroke-width="2.2" stroke-linecap="round"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em">Aurel</span>
+<span style="font-size: 12px; color: #8C9098">Voice Studio</span>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a class="nav" href="Main.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12h1M7 8v8M11 4v16M15 8v8M19 11v2"></path></svg>
+Studio</a>
+<a class="nav" href="Profiles.dc.html" aria-current="page" style="position: relative; height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; background: #1D1F24; color: #F3F2EF; font-size: 14px; font-weight: 500">
+<span style="position: absolute; left: 0; top: 12px; width: 3px; height: 16px; border-radius: 2px; background: #F5A623"></span>
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 8l9 5 9-5-9-5z"></path><path d="m3 13 9 5 9-5"></path></svg>
+Profiles</a>
+<a class="nav" href="FineTune.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"></path><circle cx="15" cy="6" r="2"></circle><circle cx="9" cy="12" r="2"></circle><circle cx="17" cy="18" r="2"></circle></svg>
+Fine-tune</a>
+<a class="nav" href="Connect.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><path d="M17.5 14v7M14 17.5h7"></path></svg>
+Connect apps</a>
+<a class="nav" href="Settings.dc.html" style="height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 8px; color: #B9BBC1; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"></path></svg>
+Settings</a>
+</div>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+<div style="background: #17191C; border: 1px solid #24272C; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">Input</span>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 36px; height: 36px; border-radius: 9px; background: #23262B; display: flex; align-items: center; justify-content: center; color: #F3F2EF">
+<svg width="18" height="18" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; font-weight: 600">USB Microphone</span>
+<span style="font-size: 12px; color: #8C9098">USB · 48 kHz</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #43D18A"></span>Connected</span>
+<a href="Setup.dc.html" style="font-size: 12px; font-weight: 500">Run voice check</a>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 8px; font-size: 12px; color: #8C9098">
+<svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v6c0 4 3 7.5 7 9 4-1.5 7-5 7-9V6l-7-3z"></path></svg>
+Offline · processed on this PC
+</div>
+</div>
+</nav>
+
+<main style="flex-grow: 1; display: flex; flex-direction: column; min-width: 0">
+<div style="flex-grow: 1; display: flex; flex-direction: column; gap: 24px; padding: 30px 40px 28px; box-sizing: border-box; min-height: 0">
+<div style="display: flex; align-items: center; justify-content: space-between; height: 60px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.02em">Profiles</h1>
+<span style="font-size: 14px; color: #8C9098">A profile saves every setting in the voice chain. Switch with a shortcut, or let Aurel switch for you.</span>
+</div>
+<div style="display: flex; gap: 10px">
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; background: #17191C; border: 1px solid #33373E; border-radius: 10px; font-size: 13px; font-weight: 500">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 10l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg>Import .aurel file</button>
+<button style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 18px; background: #F5A623; border: 0; border-radius: 10px; font-size: 13px; font-weight: 600; color: #1B1204">
+<svg width="15" height="15" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>New profile</button>
+</div>
+</div>
+
+<div style="flex-grow: 1; display: flex; gap: 24px; min-height: 0">
+<nav aria-label="Profiles" style="width: 420px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; padding: 18px 12px; box-sizing: border-box; background: #16181B; border: 1px solid #24272C; border-radius: 16px">
+<span style="padding: 4px 12px 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">Yours</span>
+<sc-for list="{{mine}}" as="p" hint-placeholder-count="2">
+<button sc-camel-on-click="{{p.pick}}" aria-current="{{p.current}}" style="position: relative; height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; text-align: left">
+<sc-if value="{{p.selected}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 10px; background: #1F2227; border: 1px solid #3A3E46; pointer-events: none"></span></sc-if>
+<svg width="64" height="28" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true" style="position: relative; flex-shrink: 0"><path d="{{p.curve}}" fill="none" stroke="{{p.stroke}}" stroke-width="5" stroke-linecap="round"></path></svg>
+<span style="position: relative; flex-grow: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 500; color: #F3F2EF">{{p.name}}</span><span style="font-size: 12px; color: #8C9098">{{p.sub}}</span></span>
+<sc-if value="{{p.inUse}}" hint-placeholder-val="{{false}}"><span style="position: relative; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #2A2111; color: #FFC869">In use</span></sc-if>
+</button>
+</sc-for>
+<span style="padding: 16px 12px 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8C9098">Built in</span>
+<sc-for list="{{builtin}}" as="p" hint-placeholder-count="5">
+<button sc-camel-on-click="{{p.pick}}" aria-current="{{p.current}}" style="position: relative; height: 64px; flex-shrink: 0; display: flex; align-items: center; gap: 14px; padding: 0 12px; border: 0; border-radius: 10px; background: transparent; text-align: left">
+<sc-if value="{{p.selected}}" hint-placeholder-val="{{false}}"><span style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; border-radius: 10px; background: #1F2227; border: 1px solid #3A3E46; pointer-events: none"></span></sc-if>
+<svg width="64" height="28" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true" style="position: relative; flex-shrink: 0"><path d="{{p.curve}}" fill="none" stroke="{{p.stroke}}" stroke-width="5" stroke-linecap="round"></path></svg>
+<span style="position: relative; flex-grow: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 14px; font-weight: 500; color: #F3F2EF">{{p.name}}</span><span style="font-size: 12px; color: #8C9098">{{p.sub}}</span></span>
+<sc-if value="{{p.inUse}}" hint-placeholder-val="{{false}}"><span style="position: relative; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: #2A2111; color: #FFC869">In use</span></sc-if>
+</button>
+</sc-for>
+</nav>
+
+<section aria-labelledby="pd-h" style="flex-grow: 1; display: flex; flex-direction: column; gap: 22px; padding: 28px 32px; box-sizing: border-box; background: #16181B; border: 1px solid #24272C; border-radius: 16px; min-width: 0">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; gap: 10px">
+<h2 id="pd-h" style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em">{{sel.name}}</h2>
+<sc-if value="{{sel.custom}}" hint-placeholder-val="{{true}}"><button aria-label="Rename profile" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: transparent; border: 0; color: #B9BBC1"><svg width="16" height="16" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4z"></path><path d="m13.5 6.5 4 4"></path></svg></button></sc-if>
+<sc-if value="{{sel.builtIn}}" hint-placeholder-val="{{false}}"><span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 999px; background: #22252A; color: #B9BBC1"><svg width="12" height="12" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Built in</span></sc-if>
+</div>
+<span style="font-size: 14px; color: #8C9098">{{sel.meta}}</span>
+</div>
+<div style="display: flex; gap: 10px; flex-shrink: 0">
+<a href="FineTune.dc.html" style="height: 40px; display: flex; align-items: center; padding: 0 16px; border-radius: 10px; background: #17191C; border: 1px solid #33373E; box-sizing: border-box; font-size: 13px; font-weight: 500; color: #F3F2EF">Edit in Fine-tune</a>
+<sc-if value="{{sel.notInUse}}" hint-placeholder-val="{{true}}"><button sc-camel-on-click="{{useSel}}" style="height: 40px; padding: 0 18px; border-radius: 10px; background: #F5A623; border: 0; color: #1B1204; font-size: 13px; font-weight: 600">Use this profile</button></sc-if>
+<sc-if value="{{sel.inUse}}" hint-placeholder-val="{{false}}"><span style="height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 10px; background: #2A2111; color: #FFC869; font-size: 13px; font-weight: 600; box-sizing: border-box"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>In use now</span></sc-if>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 18px 20px; border-radius: 12px; background: #111215; border: 1px solid #22252A">
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #8C9098"><span>Sound signature</span><span class="mono">20 Hz · 200 Hz · 2 kHz · 20 kHz</span></div>
+<svg width="1044" height="120" sc-camel-view-box="0 0 260 40" sc-camel-preserve-aspect-ratio="none" aria-hidden="true"><line x1="0" y1="24" x2="260" y2="24" stroke="#2A2D33" stroke-width="0.4" stroke-dasharray="1 1.5"></line><path d="{{sel.curve}}" fill="none" stroke="#F5A623" stroke-width="0.9" stroke-linecap="round"></path></svg>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{sel.stats}}" as="t" hint-placeholder-count="8">
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E"><span style="font-size: 12px; color: #8C9098">{{t.k}}</span><span class="mono" style="font-size: 15px; font-weight: 500">{{t.v}}</span></div>
+</sc-for>
+</div>
+
+<div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 600">Switch to this profile automatically</span>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E">
+<span style="font-size: 13px; color: #B9BBC1">{{sel.rule}}</span>
+<button type="button" role="switch" aria-checked="{{sel.ruleOn}}" aria-label="Automatic switching rule" style="width: 40px; height: 24px; border-radius: 12px; background: {{sel.ruleBg}}; display: flex; align-items: center; justify-content: {{sel.ruleJustify}}; padding: 3px; box-sizing: border-box; flex-shrink: 0; border: 0; cursor: pointer"><span style="width: 18px; height: 18px; border-radius: 50%; background: {{sel.ruleKnob}}"></span></button>
+</div>
+<button style="align-self: flex-start; height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: 8px; background: transparent; border: 1px dashed #3A3E46; font-size: 12px; color: #B9BBC1"><svg width="13" height="13" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Add a rule</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 600">Shortcut</span>
+<div style="min-height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-radius: 10px; background: #1B1D21; border: 1px solid #26292E">
+<span style="display: flex; gap: 4px"><kbd class="mono" style="height: 28px; padding: 0 8px; display: flex; align-items: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Ctrl</kbd><kbd class="mono" style="height: 28px; padding: 0 8px; display: flex; align-items: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">Alt</kbd><kbd class="mono" style="height: 28px; padding: 0 8px; display: flex; align-items: center; border-radius: 6px; background: #23262B; border: 1px solid #3A3E46; border-bottom-width: 2px; font-size: 12px">{{sel.key}}</kbd></span>
+<button style="height: 30px; padding: 0 10px; border-radius: 6px; background: transparent; border: 0; font-size: 12px; font-weight: 500; color: #F5A623">Change</button>
+</div>
+</div>
+</div>
+
+<div style="margin-top: auto; display: flex; align-items: center; gap: 10px; padding-top: 18px; border-top: 1px solid #24272C">
+<button style="height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg>Duplicate</button>
+<button style="height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"></path></svg>Export as file</button>
+<sc-if value="{{sel.builtIn}}" hint-placeholder-val="{{false}}"><button style="height: 38px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #33373E; font-size: 13px; font-weight: 500">Reset to original</button></sc-if>
+<sc-if value="{{sel.custom}}" hint-placeholder-val="{{true}}"><a href="DeleteProfile.dc.html" style="margin-left: auto; height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 10px; background: transparent; border: 1px solid #5C2A24; box-sizing: border-box; color: #FF8A7E; font-size: 13px; font-weight: 500"><svg width="14" height="14" sc-camel-view-box="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>Delete profile</a></sc-if>
+</div>
+</section>
+</div>
+</div>
+
+<footer style="height: 30px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; border-top: 1px solid #1C1E22; background: #0F1012; font-size: 12px; color: #8C9098">
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="display: flex; align-items: center; gap: 6px; color: #B9BBC1"><span style="width: 7px; height: 7px; border-radius: 50%; background: #43D18A"></span>Audio engine running</span>
+<span class="mono">48 kHz · 24-bit · buffer 256 · total delay 9.4 ms</span>
+</div>
+<div style="display: flex; align-items: center; gap: 20px">
+<span class="mono">CPU 2.1%</span>
+<span>No internet needed</span>
+<span class="mono">v1.0</span>
+</div>
+</footer>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sel: 'stream', active: 'broadcast' }; }
+  renderVals() {
+    const st = this.state;
+    const C = {
+      broadcast: 'M0 30 C18 30 28 11 58 12 S108 25 140 25 S198 17 228 19 S254 27 260 29',
+      podcast: 'M0 33 C25 33 40 17 72 17 S120 23 150 22 S210 16 240 18 S258 25 260 27',
+      clear: 'M0 39 C20 39 34 27 60 25 S120 23 150 21 S190 9 215 11 S250 21 260 25',
+      condenser: 'M0 34 C30 34 50 24 90 24 S150 25 180 21 S230 8 260 7',
+      natural: 'M0 29 C30 26 60 24 130 24 S230 24 260 25',
+      stream: 'M0 28 C16 28 26 8 56 9 S106 26 138 26 S196 16 226 17 S254 25 260 27',
+      standup: 'M0 39 C20 39 36 29 62 27 S122 24 152 22 S192 12 216 13 S250 22 260 25'
+    };
+    const stat = (a) => a.map(([k, v]) => ({ k, v }));
+    const P = [
+      { id: 'stream', custom: true, name: 'Late-night stream', sub: 'From Broadcast · Ctrl Alt 1', meta: 'Based on Broadcast · Edited 2 days ago', key: '1', rule: 'When OBS Studio starts streaming or recording', ruleOn: true, stats: stat([['Voice Boost', '+30 dB'], ['Noise removal', 'Strong'], ['Warmth', '+3.6 dB'], ['Presence', '+1.2 dB'], ['Compressor', '4 : 1'], ['De-esser', '−5 dB'], ['Target', '−14 LUFS'], ['Analog warmth', 'Tape · 18%']]) },
+      { id: 'standup', custom: true, name: 'Morning standup', sub: 'From Clear Speech · Ctrl Alt 2', meta: 'Based on Clear Speech · Edited last week', key: '2', rule: 'When Microsoft Teams joins a meeting', ruleOn: true, stats: stat([['Voice Boost', '+24 dB'], ['Noise removal', 'Balanced'], ['Warmth', '−0.6 dB'], ['Presence', '+3.0 dB'], ['Compressor', '3 : 1'], ['De-esser', '−4 dB'], ['Target', '−16 LUFS'], ['Analog warmth', 'Tape · 18%']]) },
+      { id: 'broadcast', name: 'Broadcast', sub: 'Deep and controlled · Ctrl Alt 3', key: '3' },
+      { id: 'podcast', name: 'Podcast', sub: 'Rich and even · Ctrl Alt 4', key: '4' },
+      { id: 'clear', name: 'Clear Speech', sub: 'Crisp for meetings · Ctrl Alt 5', key: '5' },
+      { id: 'condenser', name: 'Studio Condenser', sub: 'Airy and detailed · Ctrl Alt 6', key: '6' },
+      { id: 'natural', name: 'Natural', sub: 'Light cleanup · Ctrl Alt 7', key: '7' }
+    ];
+    const defStats = stat([['Voice Boost', '+26 dB'], ['Noise removal', 'Balanced'], ['Warmth', '+1.4 dB'], ['Presence', '−0.2 dB'], ['Compressor', '3 : 1'], ['De-esser', '−4 dB'], ['Target', '−16 LUFS'], ['Analog warmth', 'Tape · 18%']]);
+    const all = P.map((p) => ({ ...p, curve: C[p.id], selected: st.sel === p.id, current: st.sel === p.id ? 'true' : 'false', inUse: st.active === p.id, stroke: st.sel === p.id ? '#F5A623' : '#8C9098', pick: () => this.setState({ sel: p.id }) }));
+    const s0 = all.find((p) => p.selected);
+    const on = !!s0.ruleOn;
+    const sel = { ...s0, builtIn: !s0.custom, custom: !!s0.custom, notInUse: !s0.inUse,
+      meta: s0.meta || 'Built in · Your Voice Boost is kept when you switch',
+      stats: s0.stats || defStats,
+      rule: s0.rule || 'No rules yet. Add one to switch when an app starts.',
+      ruleOn: on ? 'true' : 'false', ruleBg: on ? '#F5A623' : '#666A73', ruleJustify: on ? 'flex-end' : 'flex-start', ruleKnob: on ? '#1B1204' : '#B9BBC1' };
+    return { mine: all.filter((p) => p.custom), builtin: all.filter((p) => !p.custom), sel, useSel: () => this.setState({ active: st.sel }) };
+  }
+}
+</script>
+
+
+</body></html>
