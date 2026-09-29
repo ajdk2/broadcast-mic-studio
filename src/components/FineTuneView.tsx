@@ -231,12 +231,27 @@ function EqPanel({ style }: { style?: React.CSSProperties }) {
   const curveD = 'M' + curve.join(' L');
   const fillD = `${curveD} L${W} ${EQ_H / 2} L0 ${EQ_H / 2} Z`;
 
-  // Shelves reach half their gain at the corner frequency, so their handle sits there, on the curve.
+  // Handles sit on the combined curve (the sum of every band), so overlapping bands never pull the
+  // line away from them. A shelf reaches half its gain at its corner, a bell its full gain at its centre.
   const isShelf = (i: number) => bands[i].type === 'lowshelf' || bands[i].type === 'highshelf';
+  const others = (i: number, f: number) =>
+    eqResponseDb(bands.filter((_, j) => j !== i && j > 0), f) + (i !== 0 && w.rumble.enabled ? eqResponseDb([bands[0]], f) : 0);
   const pointFor = (i: number) => {
     const b = bands[i];
-    const db = i === 0 ? -3 : isShelf(i) ? b.gainDb / 2 : b.gainDb;
+    const db = others(i, b.freq) + eqResponseDb([b], b.freq);
     return { x: fxW(b.freq), y: Math.max(8, Math.min(EQ_H - 8, dy(db))) };
+  };
+
+  // Bands keep their order, so they can't cross over and cancel each other out.
+  const limits: [number, number][] = [[20, 300], [40, 500], [100, 2000], [500, 12000], [2000, 18000]];
+  const freqRange = (i: number, fs: number[]): [number, number] => {
+    const [lo, hi] = limits[i];
+    if (i === 0) return [lo, hi];
+    return [Math.max(lo, i > 1 ? fs[i - 1] * 1.15 : lo), Math.min(hi, i < 4 ? fs[i + 1] / 1.15 : hi)];
+  };
+  const clampFreq = (i: number, f: number, fs: number[]) => {
+    const [lo, hi] = freqRange(i, fs);
+    return Math.round(Math.max(lo, Math.min(hi, f)));
   };
 
   const move = (e: React.PointerEvent) => {
@@ -245,16 +260,15 @@ function EqPanel({ style }: { style?: React.CSSProperties }) {
     const x = ((e.clientX - r.left) / r.width) * W;
     const y = ((e.clientY - r.top) / r.height) * EQ_H;
     const i = drag.current;
-    const limits: [number, number][] = [[20, 300], [40, 500], [100, 2000], [500, 12000], [2000, 18000]];
-    const [lo, hi] = limits[i];
-    const freq = Math.round(Math.max(lo, Math.min(hi, xf(x))));
+    const freq = clampFreq(i, xf(x), bands.map((b) => b.freq));
     s.updateWorking((d) => {
       d.eq.bands[i].freq = freq;
       if (i > 0) {
-        // Dragged gain is the shown gain; take the tone slider's share back out.
+        // The point goes where the pointer is: this band makes up whatever the others don't.
+        // The tone sliders' share is taken back out, since effectiveBands adds it on.
         const tone = i === 1 ? d.tone.warmthDb : i === 3 ? d.tone.presenceDb : 0;
-        const shown = isShelf(i) ? yd(y) * 2 : yd(y);
-        d.eq.bands[i].gainDb = Math.round(Math.max(-12, Math.min(12, shown - tone)) * 10) / 10;
+        const own = (yd(y) - others(i, freq)) * (isShelf(i) ? 2 : 1);
+        d.eq.bands[i].gainDb = Math.round(Math.max(-12, Math.min(12, own - tone)) * 10) / 10;
       }
     });
   };
@@ -323,8 +337,8 @@ function EqPanel({ style }: { style?: React.CSSProperties }) {
                   const step = e.shiftKey ? 1 : 0.5;
                   if (e.key === 'ArrowUp' && i > 0) s.updateWorking((d) => void (d.eq.bands[i].gainDb = Math.min(12, d.eq.bands[i].gainDb + step)));
                   else if (e.key === 'ArrowDown' && i > 0) s.updateWorking((d) => void (d.eq.bands[i].gainDb = Math.max(-12, d.eq.bands[i].gainDb - step)));
-                  else if (e.key === 'ArrowRight') s.updateWorking((d) => void (d.eq.bands[i].freq = Math.round(d.eq.bands[i].freq * 1.05)));
-                  else if (e.key === 'ArrowLeft') s.updateWorking((d) => void (d.eq.bands[i].freq = Math.round(d.eq.bands[i].freq / 1.05)));
+                  else if (e.key === 'ArrowRight') s.updateWorking((d) => void (d.eq.bands[i].freq = clampFreq(i, d.eq.bands[i].freq * 1.05, d.eq.bands.map((b) => b.freq))));
+                  else if (e.key === 'ArrowLeft') s.updateWorking((d) => void (d.eq.bands[i].freq = clampFreq(i, d.eq.bands[i].freq / 1.05, d.eq.bands.map((b) => b.freq))));
                   else return;
                   e.preventDefault();
                   setSel(i);
