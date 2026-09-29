@@ -62,7 +62,7 @@ export function TrayPanel() {
 
         <label className="row" style={{ height: 44, justifyContent: 'space-between', gap: 10, padding: '0 14px', borderRadius: 10, background: 'var(--bg-control-2)', border: '1px solid var(--border-strong)', fontSize: 14 }}>
           <span className="xsmall faint">Profile</span>
-          <select aria-label="Sound profile" value={st.profileId} onChange={(e) => send({ type: 'selectProfile', id: e.target.value })} style={{ flexGrow: 1, background: 'transparent', border: 0, color: 'var(--text-primary)', fontWeight: 500, fontSize: 14, textAlign: 'left' }}>
+          <select className="select-bare" aria-label="Sound profile" value={st.profileId} onChange={(e) => send({ type: 'selectProfile', id: e.target.value })} style={{ flexGrow: 1, border: 0, height: '100%', color: 'var(--text-primary)', fontWeight: 500, fontSize: 14, textAlign: 'left' }}>
             {st.profiles.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
         </label>

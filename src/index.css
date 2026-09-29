@@ -22,6 +22,7 @@
   --border-strong: #33373E;
   --border-hover: #3A3E46;
   --text-primary: #F3F2EF;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F3F2EF' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --text-secondary: #B9BBC1;
   --text-tertiary: #8C9098;
   --text-disabled: #6A6E76;
@@ -74,6 +75,7 @@
   --border-strong: #D6D3CC;
   --border-hover: #C2BFB8;
   --text-primary: #1A1B1E;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A1B1E' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   --text-secondary: #4B4E56;
   --text-tertiary: #5F626A;
   --text-disabled: #94908A;
@@ -205,6 +207,10 @@ svg { flex-shrink: 0; }
 
 /* ---- Inputs ---- */
 .select, .text-input { height: 36px; min-width: 200px; border-radius: 8px; background: var(--bg-raised); border: 1px solid var(--border-strong); padding: 0 12px; color: var(--text-primary); font-size: 13px; }
+/* Design: a 14px chevron in the text colour, not the native Windows arrow. */
+select.select { appearance: none; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; padding-right: 36px; text-overflow: ellipsis; cursor: pointer; }
+select.select-bare { appearance: none; background: var(--chevron) no-repeat right center / 14px; padding-right: 24px; cursor: pointer; }
+select.select option, select.select-bare option { background: var(--bg-raised); color: var(--text-primary); }
 .text-input { height: 44px; font-size: 15px; width: 100%; }
 .text-input:focus { border-color: var(--accent); outline: none; }
 kbd { font-family: var(--font-mono); height: 28px; min-width: 28px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: var(--bg-control); border: 1px solid var(--border-hover); border-bottom-width: 2px; font-size: 12px; color: var(--text-primary); }
